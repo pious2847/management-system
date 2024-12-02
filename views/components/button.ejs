@@ -1,0 +1,78 @@
+<style>
+    .install-button .icon {
+        margin-right: 8px;
+    }
+
+    .install-success {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #4CAF50;
+        color: white;
+        padding: 16px 32px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translate(-50%, 100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+    }
+
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+        .install-button {
+            width: calc(100% - 32px);
+            margin: 16px;
+        }
+    }
+</style>
+
+<button id="installButton" class="btn btn-primary">
+    <span class="icon">📱</span>
+    <span>Install App</span>
+</button>
+
+<div id="installSuccessMessage" class="install-success">
+    Care Connect has been successfully installed!
+</div>
+
+<script>
+    let deferredPrompt;
+
+
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+
+        event.preventDefault(); // Prevent the default install prompt
+
+        deferredPrompt = event;
+
+    });
+
+
+    const installationBtn = document.getElementById('installButton')
+    // When the custom install button is clicked:
+
+    installationBtn.addEventListener('click', async () => {
+        if (deferredPrompt !== null) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                deferredPrompt = null;
+            }
+        }
+
+    });
+</script>

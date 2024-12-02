@@ -1,0 +1,96 @@
+<% if (alert.message.length> 0) { %>
+    <div class="toast-container  p-3 w-100" id="toast-container">
+        <div id="customToast" class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div
+                class="toast-header bg-<%= alert.status %> text-white d-flex align-items-center justify-content-between border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-bell-fill me-2"></i>
+                    <strong>Notification</strong>
+                </div>
+                <div class="d-flex align-items-center">
+                    <small class="mr-2">Just now</small>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"
+                        aria-label="Close"> &times;</button>
+                </div>
+            </div>
+            <div class="toast-body bg-white">
+                <%= alert.message %>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .toast {
+            min-width: 300px;
+            border: none !important;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .toast-container {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            padding: 10;
+            z-index: 200;
+            position: fixed;
+        }
+
+        .toast-header {
+            padding: 0.75rem 1rem;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .toast-body {
+            padding: 1rem;
+            font-size: 0.95rem;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .bg-success {
+            background-color: #10b981 !important;
+        }
+
+        .bg-danger {
+            background-color: #ef4444 !important;
+        }
+
+        .bg-warning {
+            background-color: #f59e0b !important;
+        }
+
+        .bg-info {
+            background-color: #3b82f6 !important;
+        }
+
+        .btn-close:focus {
+            box-shadow: none;
+        }
+
+        .btn-close {
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+    </style>
+    <% } %>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var toastElement = document.getElementById('toast-container');
+                if (toastElement) {
+                    var toast = new bootstrap.Toast(toastElement, {
+                        autohide: true,
+                        delay: 5000 // Hide after 5 seconds
+                    });
+                    console.log('Toast initialized');
+                    toast.show();
+                    console.log('Toast shown');
+                }
+            });
+        </script>

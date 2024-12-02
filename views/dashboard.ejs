@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./layouts/header') %>
+
+    <body>
+
+        <div class="container-fluid">
+            <div class="row ">
+
+                <%- include('./layouts/sidebar') %>
+                    <!-- Mobile Overlay -->
+                    <div class="mobile-overlay"></div>
+                    <div class="main-content p-3">
+                        <%- include('./layouts/topnav') %>
+
+
+                            <div class="content-wrapper my-5">
+
+                                <div class="welcome mb-4 mt-5">
+                                    <h4 class="text-primary font-monospace">Overview</h4>
+                                    <p class="small">A brief summary of organization records </p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-4">
+                                      <div class="card">
+                                        <div class="card-body">
+                                          <div class="d-flex align-items-center">
+                                            <i class="bx bxs-package icon text-primary ">   </i>
+                                            <div>
+                                              <div class="h4 mb-0"><%= totalMaterials %></div>
+                                              <div class="text-muted">Total Materials</div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4 mb-4">
+                                      <div class="card">
+                                        <div class="card-body">
+                                          <div class="d-flex align-items-center">
+                                            <i class="bx bxs-truck icon fs-1 me-3 text-primary"></i>
+                                            <div>
+                                              <div class="h4 mb-0"><%= totalSupplies %></div>
+                                              <div class="text-muted">Total Supplies</div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4 mb-4">
+                                      <div class="card">
+                                        <div class="card-body">
+                                          <div class="d-flex align-items-center">
+                                            <i class='bx bx-group icon fs-1 me-3 text-primary'></i>
+                                            <div>
+                                              <div class="h4 mb-0"><%= totalUsers %></div>
+                                              <div class="text-muted">Total Users</div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                            </div>
+                    </div>
+            </div>
+        </div>
+
+
+    </body>
+
+</html>

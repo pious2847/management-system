@@ -1,0 +1,84 @@
+<!-- payment-modal.ejs -->
+<% if (paymentDetails) { %>
+    <!-- Overlay -->
+    <div id="paymentOverlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9998;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    ">
+        <!-- Modal Container -->
+        <div id="paymentModal" style="
+            width: 90%;
+            max-width: 1000px;
+            height: 90vh;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        ">
+            <!-- Payment iFrame -->
+            <iframe 
+                src="<%= paymentDetails.authourize_url %>" 
+                style="
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                "
+                allow="payment"
+                id="paymentFrame"
+            ></iframe>
+        </div>
+    </div>
+
+    <!-- Prevent page scrolling when modal is open -->
+    <style>
+        body.payment-modal-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+    </style>
+
+    <script>
+        // Execute when the document is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add class to body to prevent scrolling
+            document.body.classList.add('payment-modal-open');
+
+            // Prevent closing with escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Prevent clicking outside to close
+            const overlay = document.getElementById('paymentOverlay');
+            const modal = document.getElementById('paymentModal');
+
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+
+            // Handle iframe load event
+            const paymentFrame = document.getElementById('paymentFrame');
+            paymentFrame.addEventListener('load', function() {
+                console.log('Payment iframe loaded');
+            });
+        });
+    </script>
+<% } %>

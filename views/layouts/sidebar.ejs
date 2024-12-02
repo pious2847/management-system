@@ -1,0 +1,68 @@
+<nav class="sidebar">
+  <div class="sidebar-header">
+
+      <div class="menu-toggle">
+          <i class='bx bx-menu'></i>
+      </div>
+      <img src="/icons/icon-92x92.png" alt="" class="logo-icon">
+      
+      <span class="logo-text"><span class="text-primary">Care</span>-Connect</span>
+  </div>
+  <ul class="nav-links">
+    <li class="nav-item">
+        <a href="/dashboard/" class="nav-link">
+            <i class='bx bx-grid-alt'></i>
+            <span class="link-text">Overview</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a href="/dashboard/materials" class="nav-link">
+            <i class='bx bx-store-alt'></i>
+            <span class="link-text">Materials</span>
+        </a>
+    </li>
+   
+ 
+      <!-- Add more nav items as needed -->
+  </ul>
+</nav>
+
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileOverlay = document.querySelector('.mobile-overlay');
+            
+            // Desktop menu toggle
+            menuToggle.addEventListener('click', () => {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                }
+            });
+
+            // Mobile menu toggle
+            mobileMenu.addEventListener('click', () => {
+                sidebar.classList.add('mobile-active');
+                mobileOverlay.classList.add('active');
+            });
+
+            // Close mobile menu when clicking overlay
+            mobileOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('mobile-active');
+                mobileOverlay.classList.remove('active');
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('mobile-active');
+                    mobileOverlay.classList.remove('active');
+                }
+            });
+        });
+
+</script>

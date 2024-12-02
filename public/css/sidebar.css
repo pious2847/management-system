@@ -1,0 +1,449 @@
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  :root {
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 70px;
+    --topnav-height: 60px;
+    --primary-color: #49fd94;
+    --primary-color-light: #49fd9452;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    min-height: 100vh;
+    background: #ffffff;
+  }
+
+  .layout-wrapper {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar Styles */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: var(--sidebar-width);
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: 4px 0 10px var(--shadow-color);
+    z-index: 1000;
+  }
+
+  .sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+  }
+
+  .sidebar-header {
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+
+  }
+
+  .logo-icon {
+    display: none;
+    min-width: 40px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .sidebar.collapsed .logo-text {
+    opacity: 0;
+    width: 0;
+  }
+
+  .menu-toggle {
+    cursor: pointer;
+    padding: 0 15px;
+    font-size: 24px;
+  }
+
+  .mobile-menu {
+    display: none;
+    cursor: pointer;
+    font-size: 24px;
+  }
+
+  .nav-links {
+    padding: 15px 0;
+    height: calc(100vh - var(--topnav-height));
+    overflow-y: auto;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .nav-links::-webkit-scrollbar-thumb {
+    background: var(--primary-color-light);
+  }
+
+  .nav-item {
+    list-style: none;
+    position: relative;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.nav-link:hover {
+    background: var(--primary-color-light);
+}
+
+.nav-link i {
+    min-width: 40px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.link-text {
+    transition: opacity 0.3s ease, width 0.3s ease;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .link-text {
+    opacity: 0;
+    width: 0;
+}
+
+.nav-item .sub-menu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 200px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.nav-item:hover .sub-menu {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sidebar.collapsed .nav-item .sub-menu {
+    display: none;
+}
+
+.sidebar.collapsed .nav-item:hover .sub-menu {
+    display: block;
+}
+
+  /* Main Content Styles */
+  .main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+  }
+
+  .main-content.expanded {
+    margin-left: var(--sidebar-collapsed-width);
+  }
+
+  .topnav {
+    height: var(--topnav-height);
+    background: white;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 7px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .facilitylogo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .facilitylogo img{
+    height: 30px;
+    aspect-ratio: 1;
+    border-radius: 5;
+
+  }
+  .facilitylogo h4{
+    font-size: 20px;
+  }
+  .contentwrapper {
+    padding: 20px;
+  }
+
+    .hospitalcards {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    
+    .hospitalcard {
+      display: flex;
+      flex-direction: column;
+      width: 35%;
+      gap: 1rem;
+    }
+    
+    .hospitalcard .card-item {
+      height: 9rem;
+    }
+    
+    .hospitalcard .card-item:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .megacard {
+      width: calc(65% - 1rem);
+      flex-grow: 1;
+  }
+  
+  .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+  }
+  .metric-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .metric-value {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .metric-label {
+    font-size: 18px;
+    color: #6c757d;
+  }
+
+  .icon {
+    font-size: 36px;
+    margin-right: 1.5rem;
+  }
+  /* Mobile Styles */
+  @media screen and (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%) !important;
+        width: 240px !important;
+    }
+
+    .sidebar.mobile-active {
+      transform: translateX(0) !important;
+    }
+
+    .main-content {
+      margin-left: 0 !important;
+      width: 100% !important;
+      padding: 10px !important;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+    }
+
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    .mobile-overlay.active {
+      display: block;
+    }
+
+    .menu-toggle {
+      display: none;
+    }
+
+    .mobile-menu {
+      display: block;
+      cursor: pointer;
+    }
+
+    .logo-icon {
+      display: block;
+    }
+    .facilitylogo{
+      margin-left: 0.5rem;
+      border-radius: 50%;
+    }
+    .facilitylogo h4{
+      font-size: 11px;
+    }
+    .hospitalcards {
+      flex-wrap: wrap;
+    }
+  
+    .hospitalcard {
+      width: 100%;
+    }
+  
+    .megacard {
+      width: 100%;
+  }
+    .contentwrapper{
+      width: 100%;
+    }
+    .hospitalMetricsChart{
+      width: 80%;
+    }
+  }
+
+
+     /* Base table styles */
+     .tablecontainer {
+      overflow-x: auto;
+      /* margin: 1rem 0; */
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+
+  table th,
+  table td {
+      padding: 0.3rem;
+      vertical-align: middle;
+      border-top: 1px solid #dee2e6;
+      font-size: 0.7rem;
+  }
+
+  /* Responsive styles */
+  @media screen and (max-width: 992px) {
+      .tablecontainer {
+          margin: 0.5rem 0;
+      }
+
+      table th,
+      table td {
+          padding: 0.4rem;
+          font-size: 0.675rem;
+
+      }
+  }
+
+  @media screen and (max-width: 768px) {
+      .welcome {
+          text-align: center;
+          margin-bottom: 1rem;
+      }
+
+      .row.justify-content-between {
+          flex-direction: column;
+          align-items: center;
+      }
+
+      table th,
+      table td {
+          padding: 0.4rem;
+          font-size: 0.775rem;
+
+      }
+
+      .btn-primary {
+          margin-top: 1rem !important;
+          width: 100%;
+          max-width: 200px;
+      }
+
+      /* Convert table to cards on mobile */
+      table,
+      thead,
+      tbody,
+      tr,
+      th,
+      td {
+          display: block;
+      }
+
+      thead tr {
+          position: absolute;
+          top: -9999px;
+          left: -9999px;
+      }
+
+      tr {
+          border: 1px solid #dee2e6;
+          margin-bottom: 1rem;
+          border-radius: 8px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      td {
+          position: relative;
+          padding-left: 50% !important;
+          border: none;
+          border-bottom: 1px solid #eee;
+      }
+
+      td:before {
+          content: attr(data-label);
+          position: absolute;
+          left: 0.75rem;
+          width: 45%;
+          padding-right: 0.75rem;
+          font-weight: bold;
+          text-align: left;
+      }
+
+      td:last-child {
+          border-bottom: none;
+      }
+
+      /* Special handling for profile picture */
+      td:nth-child(2) {
+          text-align: center;
+          padding-left: 0.75rem !important;
+      }
+
+      /* Action buttons on mobile */
+      .btn-group {
+          display: flex;
+          gap: 0.5rem;
+          justify-content: flex-end;
+      }
+  }
