@@ -1,0 +1,66 @@
+<!-- Supplies Modal - To be included in forms/supplies/supply.ejs -->
+<div class="modal fade" id="suppliesModal" tabindex="-1" aria-labelledby="suppliesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="suppliesModalLabel">Add/Update Supply</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="suppliesForm" action="/supplies/save" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="_id" id="supplyId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="material" class="form-label">Material</label>
+                            <select class="form-control" id="material" name="material" required>
+                                <option value="">Select Material</option>
+                                <% materials.forEach(function(material) { %>
+                                    <option value="<%= material._id %>"><%= material.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" 
+                                required min="1" placeholder="Enter quantity">
+                        </div>
+                    </div>
+
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="SupplyTime" class="form-label">Supply Time</label>
+                            <select class="form-control" id="SupplyTime" name="SupplyTime" required>
+                                <option value="">Select Supply Time</option>
+                                <option value="day">Day</option>
+                                <option value="night">Night</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="wastedMaterial" class="form-label">Wasted Material (optional)</label>
+                            <input type="number" class="form-control" id="wastedMaterial" 
+                                name="wastedMaterial"  min="0" placeholder="Enter wasted material">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveButton">Save Supply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Optional: Form validation before submission
+    document.getElementById('suppliesForm').addEventListener('submit', function(event) {
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        this.classList.add('was-validated');
+    });
+</script>

@@ -23,6 +23,7 @@ const ejs = require('ejs');
 
 
 const routerMaterial = require('./routers/materialsrouter');
+const routerSupplies = require('./routers/supplyrouter');
 const pageRenderRouter = require('./routers/pageRender');
 
 // Error handlers
@@ -86,7 +87,8 @@ require('./database/database')()
 
 // Routes
 app.use('/', pageRenderRouter)
-app.use('/materials', routerMaterial);
+app.use(routerMaterial);
+app.use(routerSupplies)
 
 // Error handlers
 

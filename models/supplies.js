@@ -11,7 +11,7 @@ const supplySchema = new mongoose.Schema({
   },
   material:{
     type: mongoose.Schema.ObjectId,
-    ref: 'Material',
+    ref: 'Materials',
     required: true,
   },
   SupplyTime:{

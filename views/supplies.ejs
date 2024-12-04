@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./layouts/header') %>
+
+<body>
+    <%- include('./popups/alert') %>
+
+    <div class="container-fluid">
+        <div class="row">
+            <%- include('./layouts/sidebar') %>
+            
+            <div class="mobile-overlay"></div>
+            <div class="main-content p-3">
+                <%- include('./layouts/topnav') %>
+
+                <div class="content-wrapper my-5">
+                    <div class="row justify-content-between mb-4 p-4 mt-5">
+                        <div class="welcome">
+                            <h4 class="text-primary font-monospace">Supplies</h4>
+                            <p class="small">A brief summary of organization supplies records</p>
+                        </div>
+
+                        <button class="btn btn-primary p-2" style="height: 40px;" data-bs-toggle="modal"
+                            data-bs-target="#suppliesModal" onclick="prepareModal('add')">
+                            <i class="bi bi-plus"></i> Add New Supply
+                        </button>
+                        <%- include('./forms/supplies/supply') %>
+                    </div>
+
+                    <div class="table-responsive p-2">
+                        <table class="table table-striped table-hover table-responsive-stack" id="suppliesTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        <input type="checkbox" id="selectAllCheckbox" 
+                                            class="form-check-input p-0 position-relative">
+                                    </th>
+                                    <th>Material</th>
+                                    <th>Quantity</th>
+                                    <th>Supply Time</th>
+                                    <th>Expected Production</th>
+                                    <th>Remaining Materials</th>
+                                    <th>Wasted Material</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% supplies.forEach(function(supply, index) { %>
+                                    <tr>
+                                        <td data-label="Select" class="text-center">
+                                            <input type="checkbox"
+                                                class="form-check-input supply-checkbox position-relative"
+                                                data-id="<%= supply._id %>">
+                                        </td>
+                                        <td data-label="Material"><%= supply.material.name %></td>
+                                        <td data-label="Quantity"><%= supply.quantity %></td>
+                                        <td data-label="Supply Time"><%= supply.SupplyTime %></td>
+                                        <td data-label="Expected Production"><%= supply.expectedproduction %> <%= supply.material.unit %></td>
+                                        <td data-label="Remaining Materials"><%= supply.remainingmaterials %> <%= supply.material.unit %></td>
+                                        <td data-label="Wasted Material"><%= supply.wastedMaterial %> <%= supply.material.unit %></td>
+                                        <td data-label="Actions">
+                                            <div class="btn-group" role="group">
+                                                <button type="button"
+                                                    onclick="prepareModal('update', `<%= JSON.stringify(supply) %>`)"
+                                                    class="btn btn-sm btn-primary edit-btn"
+                                                    data-id="<%= supply._id %>">
+                                                    <i class='bx bx-edit'></i> Edit
+                                                </button>
+                                                <a href="/supplies/delete/<%= supply._id %>"
+                                                    class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Are you sure you want to delete this supply record? \nThis action cannot be undone.')">
+                                                    <i class='bx bx-trash'></i> Delete
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Select All Checkbox functionality
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const supplyCheckboxes = document.querySelectorAll('.supply-checkbox');
+
+            selectAllCheckbox.addEventListener('change', function() {
+                supplyCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            // Update Button Handler
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const supplyId = this.getAttribute('data-id');
+
+                    // Fetch supply details before opening modal
+                    fetch(`/supplies/details/${supplyId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch supply details');
+                            }
+
+                            return response.json();
+                        })
+                        .then(supply => {
+                            prepareModal('update', supply);
+
+                            // Show the modal
+                            const suppliesModal = new bootstrap.Modal(document.getElementById('suppliesModal'));
+                            suppliesModal.show();
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Unable to retrieve supply details');
+                        });
+                });
+            });
+        });
+
+        function prepareModal(mode, supply = null) {
+            const modalTitle = document.getElementById('suppliesModalLabel');
+            const saveButton = document.getElementById('saveButton');
+            const form = document.getElementById('suppliesForm');
+
+            // Reset form
+            form.reset();
+
+            if (mode === 'add') {
+                modalTitle.textContent = 'Add New Supply';
+                saveButton.textContent = 'Add Supply';
+                document.getElementById('supplyId').value = ''; // Clear any existing ID
+                form.action = '/supplies/save';
+            } else if (mode === 'update' && supply) {
+                modalTitle.textContent = 'Update Supply';
+                saveButton.textContent = 'Update Supply';
+                form.action = `/supplies/update/${supply._id}`;
+
+                // Populate form with supply data
+                document.getElementById('supplyId').value = supply._id;
+                document.getElementById('quantity').value = supply.quantity;
+                document.getElementById('material').value = supply.material._id;
+                document.getElementById('SupplyTime').value = supply.SupplyTime;
+                document.getElementById('expectedproduction').value = supply.expectedproduction;
+                document.getElementById('remainingmaterials').value = supply.remainingmaterials;
+                document.getElementById('wastedMaterial').value = supply.wastedMaterial;
+            }
+        }
+    </script>
+</body>
+</html>
