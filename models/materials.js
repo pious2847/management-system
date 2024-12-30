@@ -28,6 +28,8 @@ const MaterialsSchema = new mongoose.Schema({
         maxlength: 200,
     },
 
+},{
+    timestamps: true,  
 });
 
 const Materials = mongoose.model('Materials', MaterialsSchema);

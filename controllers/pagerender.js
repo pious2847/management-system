@@ -1,22 +1,32 @@
 const Materials = require("../models/materials");
 const Supply = require("../models/supplies");
 const User = require("../models/user");
+const aggregateDataIntoMonths = require("../utils/aggregate");
 
 const pageRender = {
     async getDashboard(req, res) {
         try {
-            const totalMaterials = await Materials.find().countDocuments()
-            const totalUsers = await User.find().countDocuments()
-            const totalSupplies = await Supply.find().countDocuments()
-            const LOW_STOCK_THRESHOLD = 10
+            const totalMaterials = await Materials.find().countDocuments();
+            const totalUsers = await User.find().countDocuments();
+            const totalSupplies = await Supply.find().countDocuments();
+            const LOW_STOCK_THRESHOLD = 10;
             const totalLowMaterials = await Materials.find({ stock: { $lte: LOW_STOCK_THRESHOLD, $gt: 0 } }).countDocuments();
+
+            // Format data for charts
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            const materialRecords = await aggregateDataIntoMonths(Materials)
+            const supplyRecords = await aggregateDataIntoMonths(Supply)
 
             res.render('dashboard', {
                 totalMaterials,
                 totalSupplies,
                 totalUsers,
-                totalLowMaterials
-            })
+                totalLowMaterials,
+                months: JSON.stringify(months),
+                materialData: materialRecords,
+                supplyData: supplyRecords
+            });
         } catch (error) {
             console.error(error);
         }

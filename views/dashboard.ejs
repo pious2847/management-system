@@ -3,87 +3,198 @@
 
 <%- include('./layouts/header') %>
 
-    <body>
+  <body>
 
-        <div class="container-fluid">
-            <div class="row ">
+    <div class="container-fluid">
+      <div class="row ">
 
-                <%- include('./layouts/sidebar') %>
-                    <!-- Mobile Overlay -->
-                    <div class="mobile-overlay"></div>
-                    <div class="main-content p-3">
-                        <%- include('./layouts/topnav') %>
+        <%- include('./layouts/sidebar') %>
+          <!-- Mobile Overlay -->
+          <div class="mobile-overlay"></div>
+          <div class="main-content p-3">
+            <%- include('./layouts/topnav') %>
 
 
-                            <div class="content-wrapper my-5">
+              <div class="content-wrapper my-5">
 
-                                <div class="welcome mb-4 mt-5">
-                                    <h4 class="text-primary font-monospace">Overview</h4>
-                                    <p class="small">A brief summary of organization records </p>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-3 mb-3">
-                                      <div class="card">
-                                        <div class="card-body">
-                                          <div class="d-flex align-items-center">
-                                            <i class="bx bxs-package icon text-primary ">   </i>
-                                            <div>
-                                              <div class="h4 mb-0"><%= totalMaterials %></div>
-                                              <div class="text-muted">Total Materials</div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-3 mb-3">
-                                      <div class="card">
-                                        <div class="card-body">
-                                          <div class="d-flex align-items-center">
-                                            <i class="bx bxs-truck icon fs-1 me-3 text-primary"></i>
-                                            <div>
-                                              <div class="h4 mb-0"><%= totalSupplies %></div>
-                                              <div class="text-muted">Total Supplies</div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-3 mb-3">
-                                      <div class="card">
-                                        <div class="card-body">
-                                          <div class="d-flex align-items-center">
-                                            <i class='bx bx-group icon fs-1 me-3 text-primary'></i>
-                                            <div>
-                                              <div class="h4 mb-0"><%= totalUsers %></div>
-                                              <div class="text-muted">Total Users</div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-3 mb-3">
-                                      <div class="card">
-                                        <div class="card-body">
-                                          <div class="d-flex align-items-center">
-                                            <i class='bx bx-line-chart-down icon fs-1 me-3 text-primary'></i>
-                                            <div>
-                                              <div class="h4 mb-0"><%= totalLowMaterials %></div>
-                                              <div class="text-muted">Low Stock</div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                </div>
-
-                                <!-- Chart section  -->
-                                 
+                <div class="welcome mb-4 mt-5">
+                  <h4 class="text-primary font-monospace">Overview</h4>
+                  <p class="small">A brief summary of organization records </p>
+                </div>
+                <div class="row">
+                  <div class="col-md-3 mb-3">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center">
+                          <i class="bx bxs-package icon text-primary "> </i>
+                          <div>
+                            <div class="h4 mb-0">
+                              <%= totalMaterials %>
                             </div>
+                            <div class="text-muted">Total Materials</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-            </div>
-        </div>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center">
+                          <i class="bx bxs-truck icon fs-1 me-3 text-primary"></i>
+                          <div>
+                            <div class="h4 mb-0">
+                              <%= totalSupplies %>
+                            </div>
+                            <div class="text-muted">Total Supplies</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center">
+                          <i class='bx bx-group icon fs-1 me-3 text-primary'></i>
+                          <div>
+                            <div class="h4 mb-0">
+                              <%= totalUsers %>
+                            </div>
+                            <div class="text-muted">Total Users</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center">
+                          <i class='bx bx-line-chart-down icon fs-1 me-3 text-primary'></i>
+                          <div>
+                            <div class="h4 mb-0">
+                              <%= totalLowMaterials %>
+                            </div>
+                            <div class="text-muted">Low Stock</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
+                <!-- Chart section -->
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Materials vs Supplies Trend</h5>
+                        <!-- Set fixed height container -->
+                        <div style="position: relative; height: 350px; width: 100%">
+                          <canvas id="trendChart"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Monthly Distribution</h5>
+                        <!-- Set fixed height container -->
+                        <div style="position: relative; height: 350px; width: 100%">
+                          <canvas id="distributionChart"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-    </body>
+              </div >
+          </div>
+      </div>
+    </div>
+
+ <!-- Add Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Get the data
+    const months = <%- months %>;
+    const materialData = <%- materialData %>;
+    const supplyData = <%- supplyData %>;
+
+    // Line Chart
+    const trendChart = new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Materials',
+                data: materialData,
+                borderColor: '#3b82f6',
+                tension: 0.1
+            }, {
+                label: 'Supplies',
+                data: supplyData,
+                borderColor: '#60a5fa',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Bar Chart
+    const distributionChart = new Chart(document.getElementById('distributionChart'), {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Materials',
+                data: materialData,
+                backgroundColor: '#3b82f6'
+            }, {
+                label: 'Supplies',
+                data: supplyData,
+                backgroundColor: '#a841fc'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+  </body>
 
 </html>
