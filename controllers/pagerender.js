@@ -4,8 +4,21 @@ const User = require("../models/user");
 const aggregateDataIntoMonths = require("../utils/aggregate");
 
 const pageRender = {
+
+    async getLogin(req, res){
+        const alertMessage = req.flash("message");
+        const alertStatus = req.flash("status");
+
+        const alert = { message: alertMessage, status: alertStatus };
+
+        res.render('login', {alert})
+    },
+    
     async getDashboard(req, res) {
-        try {
+        try {    const alertMessage = req.flash("message");
+        const alertStatus = req.flash("status");
+
+        const alert = { message: alertMessage, status: alertStatus };
             const totalMaterials = await Materials.find().countDocuments();
             const totalUsers = await User.find().countDocuments();
             const totalSupplies = await Supply.find().countDocuments();
@@ -22,6 +35,7 @@ const pageRender = {
                 totalMaterials,
                 totalSupplies,
                 totalUsers,
+                alert,
                 totalLowMaterials,
                 months: JSON.stringify(months),
                 materialData: materialRecords,
