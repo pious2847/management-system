@@ -90,6 +90,33 @@ const MaterialsController = {
             res.status(500).redirect('/dashboard/materials');
         }
     },
+    async reStockMaterials(req, res){
+        try {
+            const materialId = req.params.id;
+            const updateData = {
+                stock: req.body.stock
+            };
+            const updatedMaterial = await Materials.findByIdAndUpdate(
+                materialId,
+                updateData,
+                { new: true, runValidators: true }
+            );
+            if (!updatedMaterial) {
+                req.flash('message', `Material not found`);
+                req.flash('status', 'danger');
+                res.redirect('/dashboard/materials');
+            }
+            req.flash('message', `${updatedMaterial.name} stock updated successfully`);
+            req.flash('status','success');
+            res.redirect('/dashboard/materials');
+            
+        } catch (error) {
+            console.error('Error restocking material:', error);
+            req.flash('message', `Failed to restock material: ${error.message}`);
+            req.flash('status', 'danger');
+            res.status(500).redirect('/dashboard/materials');
+        }
+    },
     async deleteMaterial(req, res) {
         try {
             const material = await Materials.findByIdAndDelete(req.params.id);

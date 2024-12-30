@@ -25,6 +25,7 @@ const ejs = require('ejs');
 const routerMaterial = require('./routers/materialsrouter');
 const routerSupplies = require('./routers/supplyrouter');
 const pageRenderRouter = require('./routers/pageRender');
+const userRouter = require('./routers/user.router');
 
 // Error handlers
 const notFoundHandler = require('./middlewares/404');
@@ -89,7 +90,7 @@ require('./database/database')()
 app.use('/', pageRenderRouter)
 app.use(routerMaterial);
 app.use(routerSupplies)
-
+app.use(userRouter)
 // Error handlers
 
 app.use(notFoundHandler);

@@ -46,6 +46,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <% if (supplies && supplies.length > 0) { %>
                                 <% supplies.forEach(function(supply, index) { %>
                                     <tr>
                                         <td data-label="Select" class="text-center">
@@ -76,6 +77,13 @@
                                         </td>
                                     </tr>
                                 <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <span class="fs-5 text-muted">No Supplies Found.</span>
+                                        </td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -112,7 +120,6 @@
                         })
                         .then(supply => {
                             prepareModal('update', supply);
-
                             // Show the modal
                             const suppliesModal = new bootstrap.Modal(document.getElementById('suppliesModal'));
                             suppliesModal.show();
@@ -143,13 +150,14 @@
                 saveButton.textContent = 'Update Supply';
                 form.action = `/supplies/update/${supply._id}`;
 
+                const material = supply.material._id
+
                 // Populate form with supply data
                 document.getElementById('supplyId').value = supply._id;
                 document.getElementById('quantity').value = supply.quantity;
-                document.getElementById('material').value = supply.material._id;
+                document.getElementById('material').value = material;
+                document.getElementById('material').disable = true;
                 document.getElementById('SupplyTime').value = supply.SupplyTime;
-                document.getElementById('expectedproduction').value = supply.expectedproduction;
-                document.getElementById('remainingmaterials').value = supply.remainingmaterials;
                 document.getElementById('wastedMaterial').value = supply.wastedMaterial;
             }
         }

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./layouts/header') %>
+
+    <body>
+        <%- include('./popups/alert') %>
+
+            <div class="container-fluid">
+                <div class="row ">
+
+                    <%- include('./layouts/sidebar') %>
+                        <!-- Mobile Overlay -->
+                        <div class="mobile-overlay"></div>
+                        <div class="main-content p-3">
+                            <%- include('./layouts/topnav') %>
+
+
+                                <div class="content-wrapper my-5">
+                                    <div class="row justify-content-between mb-4 p-4  mt-5">
+                                        <div class="welcome ">
+                                            <h4 class="text-primary font-monospace">Materials Low In Stock</h4>
+                                            <p class="small">A brief summary of organization materials stock records
+                                            </p>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="table-responsive p-2">
+                                        <table class="table table-striped table-hover table-responsive-stack"
+                                            id="materialsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">
+                                                        <input type="checkbox" id="selectAllCheckbox"
+                                                            class="form-check-input p-0 position-relative">
+                                                    </th>
+                                                    <th>Material Name</th>
+                                                    <th>Weight</th>
+                                                    <th>Unit Price</th>
+                                                    <th>Description</th>
+                                                    <th>Stock</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody >
+                                                <% if (materials && materials.length > 0) { %>
+                                                    <% materials.forEach(function(material, index) { %>
+                                                        <tr class="danger">
+                                                            <td data-label="Select" class="text-center">
+                                                                <input type="checkbox" class="form-check-input material-checkbox position-relative" data-id="<%= material.id %>">
+                                                            </td>
+                                                            <td data-label="Material Name">
+                                                                <%= material.name %>
+                                                            </td>
+                                                            <td data-label="Weight">
+                                                                <%= material.weight %> <%= material.unit %>
+                                                            </td>
+                                                            <td data-label="Unit Price">
+                                                                $<%= material.unitPrice.toFixed(2) %>
+                                                            </td>
+                                                            <td data-label="Description">
+                                                                <%= material.description %>
+                                                            </td>
+                                                            <form action="/materials/restock/<%= material._id %>" method="post">
+                                                                <td data-label="Select" class="col-md-3 mb-3">
+                                                                    <input type="number" value="<%= material.stock %>" name="stock" class="form-control" min="1">
+                                                                </td>
+                                                                <td data-label="Actions">
+                                                                    <button type="submit" class="btn btn-sm btn-primary edit-btn">
+                                                                        Re-Stock 
+                                                                    </button>
+                                                                </td>
+                                                            </form>
+                                                        </tr>
+                                                    <% }); %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="7" class="text-center py-4">
+                                                            <span class="fs-5 text-muted">No Materials Low in Stock</span>
+                                                        </td>
+                                                    </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                        </div>
+                </div>
+            </div>
+
+
+    </body>
+
+</html>

@@ -7,5 +7,8 @@ const pageRender = require('../controllers/pagerender')
 router.get('/', pageRender.getDashboard)
 router.get('/dashboard/materials', pageRender.getMaterials)
 router.get('/dashboard/supplies', pageRender.getSupplies)
+router.get('/dashboard/low-stock', pageRender.getLowStockMaterials)
+router.get('/dashboard/users', pageRender.getUsers)
+
 
 module.exports = router

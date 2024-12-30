@@ -19,65 +19,56 @@
                                 <div class="content-wrapper my-5">
                                     <div class="row justify-content-between mb-4 p-4  mt-5">
                                         <div class="welcome ">
-                                            <h4 class="text-primary font-monospace">Materials</h4>
-                                            <p class="small">A brief summary of organization materials records </p>
+                                            <h4 class="text-primary font-monospace">User</h4>
+                                            <p class="small">A brief summary of organization user records </p>
                                         </div>
 
                                         <button class="btn btn-primary p-2" style="height: 40px;" data-bs-toggle="modal"
-                                            data-bs-target="#materialsModal" onclick="prepareModal('add')">
-                                            <i class="bi bi-plus"></i> Add New Material
+                                            data-bs-target="#usersModal" onclick="prepareModal('add')">
+                                            <i class="bi bi-plus"></i> Add New User
                                         </button>
-                                        <%- include('./forms/materials/material') %>
+                                        <%- include('./forms/users/user') %>
                                     </div>
 
 
                                     <div class="table-responsive p-2">
                                         <table class="table table-striped table-hover table-responsive-stack"
-                                            id="materialsTable">
+                                            id="usersTable">
                                             <thead>
                                                 <tr>
                                                     <th class="text-center">
                                                         <input type="checkbox" id="selectAllCheckbox"
                                                             class="form-check-input p-0 position-relative">
                                                     </th>
-                                                    <th>Material Name</th>
-                                                    <th>Weight</th>
-                                                    <th>Stock</th>
-                                                    <th>Unit Price</th>
-                                                    <th>Description</th>
+                                                    <th>Username</th>
+                                                    <th>Email</th>
+                                                    <th>Role</th>
                                                     <th>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <% if (materials && materials.length > 0) { %>
-                                                    <% materials.forEach(function(material, index) { %>
+                                                <% if (users && users.length > 0) { %>
+                                                    <% users.forEach(function(user, index) { %>
                                                         <tr>
                                                             <td data-label="Select" class="text-center">
-                                                                <input type="checkbox" class="form-check-input material-checkbox  position-relative" data-id="<%= material.id %>">
+                                                                <input type="checkbox" class="form-check-input user-checkbox  position-relative" data-id="<%= user.id %>">
                                                             </td>
-                                                            <td data-label="Material Name">
-                                                                <%= material.name %>
+                                                            <td data-label="user Name">
+                                                                <%= user.username %>
                                                             </td>
                                                             <td data-label="Weight">
-                                                                <%= material.weight %>
-                                                                <%= material.unit %>
+                                                                <%= user.email %>
                                                             </td>
                                                             <td data-label="Stock">
-                                                                <%= material.stock %>
-                                                            </td>
-                                                            <td data-label="Unit Price">
-                                                                $<%= material.unitPrice.toFixed(2) %>
-                                                            </td>
-                                                            <td data-label="Description">
-                                                                <%= material.description %>
+                                                                <%= user.role %>
                                                             </td>
                                                             <td data-label="Actions">
                                                                 <div class="btn-group" role="group">
-                                                                    <button type="button" onclick="prepareModal('update', `<%= JSON.stringify(material)%>`)" 
-                                                                            class="btn btn-sm btn-primary edit-btn" data-id="<%= material._id %>">
+                                                                    <button type="button" onclick="prepareModal('update', `<%= JSON.stringify(user)%>`)" 
+                                                                            class="btn btn-sm btn-primary edit-btn" data-id="<%= user._id %>">
                                                                         <i class='bx bx-edit'></i> Edit
                                                                     </button>
-                                                                    <a href="/materials/delete/<%= material._id %>" 
+                                                                    <a href="/users/delete/<%= user._id %>" 
                                                                        class="btn btn-sm btn-danger ms-1"
                                                                        onclick="return confirm('Are you sure you want to delete this staff member? \nThis action cannot be undone. This will permanently delete your account and remove your data from our servers.')">
                                                                         <i class='bx bx-trash'></i> Delete
@@ -89,7 +80,7 @@
                                                 <% } else { %>
                                                     <tr>
                                                         <td colspan="7" class="text-center py-4">
-                                                            <span class="fs-5 text-muted">No Materials Found. Please Add materials</span>
+                                                            <span class="fs-5 text-muted">No users Found. Please Add users</span>
                                                         </td>
                                                     </tr>
                                                 <% } %>
@@ -106,69 +97,67 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     // Select All Checkbox functionality
                     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-                    const materialCheckboxes = document.querySelectorAll('.material-checkbox');
+                    const userCheckboxes = document.querySelectorAll('.user-checkbox');
 
                     selectAllCheckbox.addEventListener('change', function () {
-                        materialCheckboxes.forEach(checkbox => {
+                        userCheckboxes.forEach(checkbox => {
                             checkbox.checked = selectAllCheckbox.checked;
                         });
                     });
                     // Update Button Handler
                     document.querySelectorAll('.edit-btn').forEach(button => {
                         button.addEventListener('click', function () {
-                            const materialId = this.getAttribute('data-id');
+                            const userId = this.getAttribute('data-id');
 
-                            // Fetch material details before opening modal
-                            fetch(`/materials/details/${materialId}`)
+                            // Fetch user details before opening modal
+                            fetch(`/users/details/${userId}`)
                                 .then(response => {
                                     if (!response.ok) {
-                                        throw new Error('Failed to fetch material details');
+                                        throw new Error('Failed to fetch user details');
                                     }
                                     return response.json();
                                 })
-                                .then(material => {
-                                    // Populate modal with fetched material data
-                                    prepareModal('update', material);
+                                .then(user => {
+                                    // Populate modal with fetched user data
+                                    prepareModal('update', user);
 
                                     // Show the modal
-                                    const materialsModal = new bootstrap.Modal(document.getElementById('materialsModal'));
-                                    materialsModal.show();
+                                    const usersModal = new bootstrap.Modal(document.getElementById('usersModal'));
+                                    usersModal.show();
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
-                                    alert('Unable to retrieve material details');
+                                    alert('Unable to retrieve user details');
                                 });
                         });
                     });
                 });
 
                 // Modify existing prepareModal function
-                function prepareModal(mode, material = null) {
-                    const modalTitle = document.getElementById('materialsModalLabel');
+                function prepareModal(mode, user = null) {
+                    const modalTitle = document.getElementById('usersModalLabel');
                     const saveButton = document.getElementById('saveButton');
-                    const form = document.getElementById('materialsForm');
+                    const form = document.getElementById('usersForm');
 
                     // Reset form
                     form.reset();
 
                     if (mode === 'add') {
-                        modalTitle.textContent = 'Add New Material';
-                        saveButton.textContent = 'Add Material';
-                        document.getElementById('materialId').value = ''; // Clear any existing ID
-                        form.action = '/materials/save'; // Ensure correct form submission route
-                    } else if (mode === 'update' && material) {
-                        modalTitle.textContent = 'Update Material';
-                        saveButton.textContent = 'Update Material';
-                        form.action = `/materials/update/${material._id}`; // Specific update route
+                        modalTitle.textContent = 'Add New User';
+                        saveButton.textContent = 'Add User';
+                        document.getElementById('userId').value = ''; // Clear any existing ID
+                        form.action = '/users/save'; // Ensure correct form submission route
+                    } else if (mode === 'update' && user) {
+                        modalTitle.textContent = 'Update User';
+                        saveButton.textContent = 'Update User';
+                        form.action = `/users/update/${user._id}`; // Specific update route
 
-                        // Populate form with material data
-                        document.getElementById('materialId').value = material._id;
-                        document.getElementById('name').value = material.name;
-                        document.getElementById('stock').value = material.stock;
-                        document.getElementById('unit').value = material.unit;
-                        document.getElementById('weight').value = material.weight;
-                        document.getElementById('unitPrice').value = material.unitPrice;
-                        document.getElementById('description').value = material.description;
+                        // Populate form with user data
+                        document.getElementById('userId').value = user._id;
+                        document.getElementById('username').value = user.username;
+                        document.getElementById('email').value = user.email;
+                        document.getElementById('role').value = user.role;                      
+                        document.getElementById('password').value = user.password;                      
                     }
                 }
             </script>

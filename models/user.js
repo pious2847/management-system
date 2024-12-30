@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-// create  user model
-
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -19,12 +17,8 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin'],
-        default: 'user'
-    },
-    isActive: {
-        type: Boolean,
-        default: true
+        enum: ['supplier', 'admin'],
+        default: 'admin'
     },
 
 },
