@@ -40,8 +40,11 @@
                                     <th>Quantity</th>
                                     <th>Supply Time</th>
                                     <th>Expected Production</th>
-                                    <th>Remaining Materials</th>
+                                    <th>Total Production</th>
+                                    <th>Remaining Stock</th>
+                                    <th>Materials Remains</th>
                                     <th>Wasted Material</th>
+
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -58,7 +61,9 @@
                                         <td data-label="Quantity"><%= supply.quantity %></td>
                                         <td data-label="Supply Time"><%= supply.SupplyTime %></td>
                                         <td data-label="Expected Production"><%= supply.expectedproduction %> <%= supply.material.unit %></td>
-                                        <td data-label="Remaining Materials"><%= supply.remainingmaterials %> <%= supply.material.unit %></td>
+                                        <td data-label="Total Production"><%= supply.finalremainingmaterial %> <%= supply.material.unit %></td>
+                                        <td data-label="Remaining Stock"><%= supply.remainingmaterials %> </td>
+                                        <td data-label="Materials Remains"><%= supply.dailyRemainingmaterial %> </td>
                                         <td data-label="Wasted Material"><%= supply.wastedMaterial %> <%= supply.material.unit %></td>
                                         <td data-label="Actions">
                                             <div class="btn-group" role="group">
@@ -150,15 +155,14 @@
                 saveButton.textContent = 'Update Supply';
                 form.action = `/supplies/update/${supply._id}`;
 
-                const material = supply.material._id
 
                 // Populate form with supply data
                 document.getElementById('supplyId').value = supply._id;
                 document.getElementById('quantity').value = supply.quantity;
-                document.getElementById('material').value = material;
-                document.getElementById('material').disabled = true;
+                document.getElementById('material').value = supply.material._id;
                 document.getElementById('SupplyTime').value = supply.SupplyTime;
                 document.getElementById('wastedMaterial').value = supply.wastedMaterial;
+                document.getElementById('dailyRemainingmaterial').value = supply.dailyRemainingmaterial;
             }
         }
     </script>

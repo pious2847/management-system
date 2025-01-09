@@ -175,7 +175,7 @@ const userController = {
             console.error('Error logging out:', error);
             req.flash('message', `An unexpected error occurred. Please try again later.`);
             req.flash('status', 'danger');
-            return res.redirect('/');
+            return res.redirect('/dashboard');
         }
     }
 

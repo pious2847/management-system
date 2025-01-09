@@ -30,6 +30,16 @@ const supplySchema = new mongoose.Schema({
   wastedMaterial:{
     type: Number,
     required: true,
+  },
+  finalremainingmaterial:{
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  dailyRemainingmaterial:{
+    type: String,
+    required: false,
+    default: '',
   }
 
 }, {

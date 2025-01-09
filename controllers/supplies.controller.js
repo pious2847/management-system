@@ -11,17 +11,23 @@ const SuppliesController = {
                 req.flash('message', `Material not found`);
                 req.flash('status', 'danger');
             }
-
+            if(supplyData.quantity > material.stock){
+                req.flash('message', `Not enough stock in material. Please check material stock.`);
+                req.flash('status', 'danger');
+                res.redirect('/dashboard/supplies');
+            }
             // Calculate estimated production weight
             const expectedproduction = supplyData.quantity * material.weight;
-            const wastedMaterial = supplyData.wastedMaterial * material.weight;
-
+            const wastedMaterial = parseFloat(supplyData.wastedMaterial) || 0;
             const remainingmaterials = material.stock - supplyData.quantity;
 
-            console.log("estimatedProductionWeight", expectedproduction)
-            console.log("wastedMaterialWeight", wastedMaterial)
-
-            console.log("remainingmaterials", remainingmaterials)
+            // Calculate final remaining material weight
+            let finalremainingmaterial;
+            if (supplyData.wastedMaterial) {
+                finalremainingmaterial = expectedproduction - wastedMaterial;
+            } else {
+                finalremainingmaterial = expectedproduction;
+            }
 
             if (supplyData._id) {
                 // Update existing supply
@@ -31,6 +37,8 @@ const SuppliesController = {
                     expectedproduction,
                     wastedMaterial,
                     remainingmaterials,
+                    finalremainingmaterial,
+                    
                     { new: true }
                 );
                 req.flash('message', 'Supply Updated successfully');
@@ -45,11 +53,12 @@ const SuppliesController = {
                         ...supplyData,
                         expectedproduction,
                         wastedMaterial,
-                        remainingmaterials
+                        remainingmaterials,
+                        finalremainingmaterial
                     }
                 );
                 await newSupply.save();
-                material.quantity = material.stock - newSupply.quantity;
+                material.stock -= newSupply.quantity;
                 await material.save();
 
                 req.flash('message', 'Supply Added successfully');
@@ -84,7 +93,8 @@ const SuppliesController = {
                 quantity: req.body.quantity,
                 material: req.body.material,
                 SupplyTime: req.body.SupplyTime,
-                wastedMaterial: req.body.wastedMaterial
+                wastedMaterial: req.body.wastedMaterial,
+                dailyRemainingmaterial: req.body.dailyRemainingMaterial || ' '
             };
 
             const supply = await Supply.findById(supplyId).populate('material');
@@ -94,10 +104,20 @@ const SuppliesController = {
                 req.flash('status', 'danger');
             }
 
-            // Calculate estimated production weight
-            const estimatedProductionWeight = updateData.quantity * material.weight;
-            const wastedMaterialWeight = updateData.wastedMaterial * material.weight;
 
+            // Calculate estimated production weight
+            let expectedproduction = updateData.quantity * material.weight;
+            const wastedMaterialWeight = parseFloat(updateData.wastedMaterial) || 0;
+
+            // Calculate final remaining material weight
+            let finalremainingmaterial;
+            if (updateData.wastedMaterial > 0) {
+                finalremainingmaterial = expectedproduction - wastedMaterialWeight;
+            } else {
+                finalremainingmaterial = expectedproduction;
+            }
+
+            console.log("finalremainingmaterial",finalremainingmaterial)
             // check if the current quantity has changed and update the material quantity accordingly
             if (supply.quantity !== updateData.quantity) {
                 const supplydifference = updateData.quantity - supply.quantity
@@ -109,9 +129,11 @@ const SuppliesController = {
                     req.flash('message', `Material not found`);
                     req.flash('status', 'danger');
                 }
-
+                console.log(material);
                 material.stock -= supplydifference
                 await material.save()
+
+                console.log("supply material", material)
 
             }
 
@@ -120,8 +142,9 @@ const SuppliesController = {
                 supplyId,
                 {
                     ...updateData,
-                    estimatedProductionWeight,
+                    expectedproduction,
                     wastedMaterialWeight,
+                    finalremainingmaterial,
                 },
                 { new: true, runValidators: true }
             );
@@ -136,6 +159,7 @@ const SuppliesController = {
             req.flash('status', 'success');
             res.redirect('/dashboard/supplies');
         } catch (error) {
+            console.log(error)
             req.flash('message', `Failed to update supply: ${error.message}`);
             req.flash('status', 'danger');
             res.status(500).redirect('/dashboard/supplies');
@@ -144,7 +168,7 @@ const SuppliesController = {
     async deleteSupply(req, res) {
         try {
             const supply = await Supply.findByIdAndDelete(req.params.id);
-            if(!supply){
+            if (!supply) {
                 req.flash('message', `Supply not fount`);
                 req.flash('status', 'danger');
                 res.redirect('/dashboard/supplies');
