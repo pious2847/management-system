@@ -36,7 +36,7 @@ const supplySchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  dailyRemainingmaterial:{
+  dailyRemainingMaterial:{
     type: String,
     required: false,
     default: '',

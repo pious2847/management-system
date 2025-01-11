@@ -9,7 +9,7 @@ const userController = {
             const { username, role, email, password } = req.body;
 
             const user = await User.find({ email });
-            if (user) {
+            if (user || username === user.username) {
                 req.flash('message', `User already exist with same email`);
                 req.flash('status', 'danger');
                 res.redirect('/dashboard/users');
@@ -22,6 +22,7 @@ const userController = {
                 email,
                 password: hashedPassword
             })
+            
             await newuser.save();
 
             req.flash('message', 'User Added successfully');
@@ -155,11 +156,7 @@ const userController = {
     },
     async logout(req, res) {
         try {
-            // Set flash message before destroying the session
-            req.flash('message', `Logged out successfully`);
-            req.flash('status', 'success');
-
-            // Destroy session
+       
             req.session.destroy(err => {
                 if (err) {
                     console.error('Error destroying session:', err);

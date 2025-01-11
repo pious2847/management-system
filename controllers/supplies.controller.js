@@ -89,55 +89,66 @@ const SuppliesController = {
     async updateSupply(req, res) {
         try {
             const supplyId = req.params.id;
+    
+            // Log the incoming data
+            console.log('Updating supply data:', req.body);
+            
+            const dailyRemainingMaterial = req.body.dailyRemainingMaterial;
+
             const updateData = {
                 quantity: req.body.quantity,
                 material: req.body.material,
                 SupplyTime: req.body.SupplyTime,
                 wastedMaterial: req.body.wastedMaterial,
-                dailyRemainingmaterial: req.body.dailyRemainingMaterial || ' '
+                dailyRemainingMaterial : dailyRemainingMaterial
             };
-
+    
+            // Find and validate supply
             const supply = await Supply.findById(supplyId).populate('material');
+            if (!supply) {
+                req.flash('message', 'Supply not found');
+                req.flash('status', 'danger');
+                return res.redirect('/dashboard/supplies');
+            }
+    
             const material = supply.material;
             if (!material) {
-                req.flash('message', `Material not found`);
+                req.flash('message', 'Material not found');
                 req.flash('status', 'danger');
+                return res.redirect('/dashboard/supplies');
             }
-
-
-            // Calculate estimated production weight
+    
+            // Calculate expected production weight
             let expectedproduction = updateData.quantity * material.weight;
             const wastedMaterialWeight = parseFloat(updateData.wastedMaterial) || 0;
-
+    
             // Calculate final remaining material weight
             let finalremainingmaterial;
-            if (updateData.wastedMaterial > 0) {
+            if (wastedMaterialWeight > 0) {
                 finalremainingmaterial = expectedproduction - wastedMaterialWeight;
             } else {
                 finalremainingmaterial = expectedproduction;
             }
-
-            console.log("finalremainingmaterial",finalremainingmaterial)
-            // check if the current quantity has changed and update the material quantity accordingly
+    
+            // Update material stock if quantity changed
             if (supply.quantity !== updateData.quantity) {
-                const supplydifference = updateData.quantity - supply.quantity
-
-                // get material and subtract new quantity from material quantity
-                const material = await Materials.findById(updateData.material);
-
-                if (!material) {
-                    req.flash('message', `Material not found`);
+                const supplydifference = updateData.quantity - supply.quantity;
+                
+                // Update material stock
+                const updatedMaterial = await Materials.findById(updateData.material);
+                if (!updatedMaterial) {
+                    req.flash('message', 'Material not found');
                     req.flash('status', 'danger');
+                    return res.redirect('/dashboard/supplies');
                 }
-                console.log(material);
-                material.stock -= supplydifference
-                await material.save()
-
-                console.log("supply material", material)
-
+                
+                updatedMaterial.stock -= supplydifference;
+                await updatedMaterial.save();
+                
+                // Log after update
             }
-
-
+    
+            // Update supply with all fields
             const updatedSupply = await Supply.findByIdAndUpdate(
                 supplyId,
                 {
@@ -145,21 +156,29 @@ const SuppliesController = {
                     expectedproduction,
                     wastedMaterialWeight,
                     finalremainingmaterial,
+                    dailyRemainingMaterial // Include this in the update
                 },
-                { new: true, runValidators: true }
+                { 
+                    new: true, 
+                    runValidators: true 
+                }
             );
-
+    
+            // Verify update was successful
+            console.log('Updated supply:', updatedSupply);
+    
             if (!updatedSupply) {
-                req.flash('message', `Supply not found`);
+                req.flash('message', 'Supply not found');
                 req.flash('status', 'danger');
                 return res.redirect('/dashboard/supplies');
             }
-
+    
             req.flash('message', 'Supply updated successfully');
             req.flash('status', 'success');
             res.redirect('/dashboard/supplies');
+    
         } catch (error) {
-            console.log(error)
+            console.error('Error updating supply:', error);
             req.flash('message', `Failed to update supply: ${error.message}`);
             req.flash('status', 'danger');
             res.status(500).redirect('/dashboard/supplies');

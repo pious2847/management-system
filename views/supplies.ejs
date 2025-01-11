@@ -63,7 +63,7 @@
                                         <td data-label="Expected Production"><%= supply.expectedproduction %> <%= supply.material.unit %></td>
                                         <td data-label="Total Production"><%= supply.finalremainingmaterial %> <%= supply.material.unit %></td>
                                         <td data-label="Remaining Stock"><%= supply.remainingmaterials %> </td>
-                                        <td data-label="Materials Remains"><%= supply.dailyRemainingmaterial %> </td>
+                                        <td data-label="Materials Remains"><%= supply.dailyRemainingMaterial %> </td>
                                         <td data-label="Wasted Material"><%= supply.wastedMaterial %> <%= supply.material.unit %></td>
                                         <td data-label="Actions">
                                             <div class="btn-group" role="group">
@@ -162,7 +162,7 @@
                 document.getElementById('material').value = supply.material._id;
                 document.getElementById('SupplyTime').value = supply.SupplyTime;
                 document.getElementById('wastedMaterial').value = supply.wastedMaterial;
-                document.getElementById('dailyRemainingmaterial').value = supply.dailyRemainingmaterial;
+                document.getElementById('dailyRemainingMaterial').value = supply.dailyRemainingMaterial;
             }
         }
     </script>
