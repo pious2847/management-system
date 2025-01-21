@@ -26,6 +26,8 @@ const routerMaterial = require('./routers/materialsrouter');
 const routerSupplies = require('./routers/supplyrouter');
 const pageRenderRouter = require('./routers/pageRender');
 const userRouter = require('./routers/user.router');
+const salesRouter = require('./routers/sales.router');
+const financeRouter = require('./routers/finance.router');
 
 // Error handlers
 const notFoundHandler = require('./middlewares/404');
@@ -91,6 +93,8 @@ app.use('/', pageRenderRouter)
 app.use(routerMaterial);
 app.use(routerSupplies)
 app.use(userRouter)
+app.use('/api/sales', salesRouter);
+app.use('/api/finance', financeRouter);
 // Error handlers
 
 app.use(notFoundHandler);

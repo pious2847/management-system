@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const pageRender = require('../controllers/pagerender');
@@ -11,6 +10,7 @@ router.get('/dashboard/materials',isLoggedIn, pageRender.getMaterials)
 router.get('/dashboard/supplies', isLoggedIn,pageRender.getSupplies)
 router.get('/dashboard/low-stock', isLoggedIn,pageRender.getLowStockMaterials)
 router.get('/dashboard/users', isLoggedIn,pageRender.getUsers)
-
+router.get('/dashboard/sales', isLoggedIn, pageRender.getSales);
+router.get('/dashboard/finance', isLoggedIn, pageRender.getFinance);
 
 module.exports = router

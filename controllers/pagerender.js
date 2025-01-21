@@ -1,6 +1,8 @@
 const Materials = require("../models/materials");
 const Supply = require("../models/supplies");
 const User = require("../models/user");
+const Sales = require('../models/sales');
+const Finance = require('../models/finance');
 const aggregateDataIntoMonths = require("../utils/aggregate");
 
 const pageRender = {
@@ -114,6 +116,83 @@ const pageRender = {
             res.render('users', { alert, users })
         } catch (error) {
 
+        }
+    },
+    async getSales(req, res) {
+        try {
+            const alertMessage = req.flash('message');
+            const alertStatus = req.flash('status');
+            const alert = { message: alertMessage, status: alertStatus };
+    
+            let { page = 1, limit = 10, startDate, endDate } = req.query;
+    
+            page = parseInt(page);
+            limit = parseInt(limit);
+    
+            const filter = {};
+            if (startDate && endDate) {
+                filter.saleDate = {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate)
+                };
+            }
+    
+            // Fetch sales with pagination
+            const sales = await Sales.find(filter)
+                .populate('productId')
+                .sort({ saleDate: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit);
+    
+            const total = await Sales.countDocuments(filter);
+    
+            const materials = await Materials.find();
+    
+            res.render('sales', {
+                sales,
+                materials,
+                alert,
+                total,
+                page,
+                limit,
+                startDate,
+                endDate,
+                title: 'Sales Management'
+            });
+        } catch (error) {
+            console.error('Error loading sales page:', error);
+            req.flash('message', 'Error loading sales page');
+            req.flash('status', 'danger');
+            res.redirect('/dashboard');
+        }
+    },
+    async getFinance(req, res) {
+        try {
+            const alertMessage = req.flash('message');
+            const alertStatus = req.flash('status');
+            const alert = { message: alertMessage, status: alertStatus };
+
+            const endDate = new Date();
+            const startDate = new Date(endDate);
+            startDate.setDate(startDate.getDate() - 30);
+
+            const transactions = await Finance.find()
+                .sort({ transactionDate: -1 })
+                .limit(10);
+
+            const totals = await Finance.calculateTotals(startDate, endDate);
+
+            res.render('finance', { 
+                transactions, 
+                totals,
+                alert,
+                title: 'Finance Management'
+            });
+        } catch (error) {
+            console.error('Error loading finance page:', error);
+            req.flash('message', 'Error loading finance page');
+            req.flash('status', 'danger');
+            res.redirect('/dashboard');
         }
     }
 }

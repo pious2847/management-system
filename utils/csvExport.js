@@ -29,6 +29,15 @@ const fieldNameMapping = {
     truckName: "Truck Name"
 };
 
+const inventoryFieldNameMapping = {
+    name: "Material Name",
+    stock: "Stock Quantity",
+    unit: "Unit",
+    weight: "Weight",
+    unitPrice: "Unit Price",
+    description: "Description",
+};
+
 /**
  * Remove unwanted fields like `_id` and `__v`
  * @param {Object} data - Object containing the data
@@ -54,6 +63,15 @@ function mapFields(data) {
     const transformedData = {};
     for (const [key, value] of Object.entries(data)) {
         const fullFieldName = fieldNameMapping[key] || key; // Use mapping or keep original
+        transformedData[fullFieldName] = value;
+    }
+    return transformedData;
+}
+
+function mapInventoryFields(data) {
+    const transformedData = {};
+    for (const [key, value] of Object.entries(data)) {
+        const fullFieldName = inventoryFieldNameMapping[key] || key;
         transformedData[fullFieldName] = value;
     }
     return transformedData;
@@ -117,6 +135,30 @@ async function exportModelToCSV(Model, outputFileName, options = {}) {
     fs.writeFileSync(fullPath, csv);
 
     return fullPath;
+}
+
+async function exportInventoryToCSV(outputFileName, options = {}) {
+    const { startDate, endDate, dateField = 'createdAt', fields = [] } = options;
+
+    const dateFilter = {};
+    if (startDate) dateFilter.$gte = startDate;
+    if (endDate) dateFilter.$lte = endDate;
+
+    const query = Object.keys(dateFilter).length > 0 ? { [dateField]: dateFilter } : {};
+    const data = await Materials.find(query);
+
+    const jsonData = data.map((doc) => {
+        const plainDoc = doc.toObject();
+        const cleanedDoc = cleanData(plainDoc);
+        const mappedDoc = mapInventoryFields(cleanedDoc);
+        return mappedDoc;
+    });
+
+    const parser = new Parser({ fields: fields.length ? fields : Object.keys(inventoryFieldNameMapping) });
+    const csv = parser.parse(jsonData);
+
+    fs.writeFileSync(outputFileName, csv);
+    return path.resolve(outputFileName);
 }
 
 /**
@@ -231,6 +273,7 @@ const exportUtils = {
             ...options
         });
     },
+    exportInventoryToCSV,
     // ... (other export methods remain unchanged)
     exportModelToCSV
 };
