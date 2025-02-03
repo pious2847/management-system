@@ -1,11 +1,12 @@
 const Sales = require('../models/sales');
 const Materials = require('../models/materials');
 const Finance = require('../models/finance');
+const Customer = require('../models/customer');
 
 // Create a new sale
 exports.createSale = async (req, res) => {
     try {
-        const { productId, quantitySold, customerName } = req.body;
+        const { productId, quantitySold, name, phone, email, paymentType } = req.body;
 
         // Check if product exists and has enough stock
         const product = await Materials.findById(productId);
@@ -15,6 +16,13 @@ exports.createSale = async (req, res) => {
         if (product.stock < quantitySold) {
             throw new Error('Insufficient stock');
         }
+        const customer = new Customer({
+            name, 
+            email, 
+            phone
+        })
+
+        await customer.save();
 
         // Calculate total price
         const totalPrice = product.unitPrice * quantitySold;
@@ -24,8 +32,9 @@ exports.createSale = async (req, res) => {
             productId,
             quantitySold,
             totalPrice,
-            customerName
+            customer: customer._id,
         });
+
         await sale.save();
 
         // Update product stock

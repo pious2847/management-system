@@ -28,6 +28,7 @@ const pageRenderRouter = require('./routers/pageRender');
 const userRouter = require('./routers/user.router');
 const salesRouter = require('./routers/sales.router');
 const financeRouter = require('./routers/finance.router');
+const paymentRouter = require('./routers/payments.router');
 
 // Error handlers
 const notFoundHandler = require('./middlewares/404');
@@ -95,6 +96,7 @@ app.use(routerSupplies)
 app.use(userRouter)
 app.use('/api/sales', salesRouter);
 app.use('/api/finance', financeRouter);
+app.use(paymentRouter)
 // Error handlers
 
 app.use(notFoundHandler);

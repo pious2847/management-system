@@ -16,8 +16,9 @@ const SalesSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
-    customerName: {
-        type: String,
+    customer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customer',
         required: true
     },
     saleDate: {
