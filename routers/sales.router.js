@@ -21,4 +21,7 @@ router.put('/:id', isLoggedIn, salesController.updateSale);
 // Delete a sale
 router.delete('/:id', isLoggedIn, salesController.deleteSale);
 
+// Route for downloading sales report
+router.get('/download-sales-report', salesController.downloadSalesReport);
+
 module.exports = router;

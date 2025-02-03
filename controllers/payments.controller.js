@@ -2,17 +2,10 @@ const Payment = require('../models/payments');
 const Sales = require('../models/sales');
 const Finance = require('../models/finance');
 const paystack = require('paystack-api')(process.env.PAYSTACK_SECRET_KEY);
-const nodemailer = require('nodemailer');
-
-// Configure email transporter
-const transporter = nodemailer.createTransport({
-    // Add your email configuration here
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    }
-});
+const { generatePaymentInitializationMessage, generatePaymentConfirmationMessage, generatePaymentFailureMessage, generateBusinessPaymentNotification } = require('../utils/messages');
+const { sendEmail } = require('../utils/MailSender');
+const reportGenerator = require('../utils/reportGenerator');
+const moment = require('moment');
 
 const PaymentController = {
     // Create new payment record for a sale
@@ -79,17 +72,6 @@ const PaymentController = {
                 }
             });
 
-            // Send email with payment link
-            await transporter.sendMail({
-                to: email,
-                subject: 'Payment Authorization Required',
-                html: `
-                    <h2>Payment Authorization Required</h2>
-                    <p>Please click the link below to complete your payment:</p>
-                    <p><a href="${response.data.authorization_url}">Complete Payment</a></p>
-                    <p>Amount: ${amount}</p>
-                `
-            });
 
             res.json({ authorization_url: response.data.authorization_url });
         } catch (error) {
@@ -101,58 +83,132 @@ const PaymentController = {
     // Verify Paystack webhook
     async paystackWebhook(req, res) {
         try {
+            // Verify webhook signature
             const hash = crypto.createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
                 .update(JSON.stringify(req.body))
-                .digest('hex');
-
+                .digest('hex'); 
+    
             if (hash !== req.headers['x-paystack-signature']) {
-                throw new Error('Invalid signature');
+                console.error('Invalid Paystack signature');
+                return res.sendStatus(401);
             }
-
+    
             const event = req.body;
-
+    
+            // Handle successful charges
             if (event.event === 'charge.success') {
-                const { paymentId } = event.data.metadata;
-                const payment = await Payment.findById(paymentId);
-
+                const { 
+                    paymentId, 
+                    customerId,
+                    amount,
+                    product 
+                } = event.data.metadata;
+    
+                // Find payment record
+                const payment = await Payment.findById(paymentId)
+                    .populate('customer')
+                    .populate('sale');
+    
                 if (!payment) {
-                    throw new Error('Payment not found');
+                    console.error(`Payment not found: ${paymentId}`);
+                    return res.sendStatus(404);
                 }
-
-                // Add payment to history
+    
+                const paidAmount = event.data.amount / 100;
+    
+                // Update payment record
                 payment.paymentHistory.push({
-                    amount: event.data.amount / 100,
+                    amount: paidAmount,
                     paymentMethod: 'paystack',
-                    status: 'completed',
+                    paymentStatus: 'completed',
+                    paymentDate: new Date(),
                     paystackReference: event.data.reference,
                     metadata: event.data
                 });
-
+    
+                // Calculate new balance
+                const newBalanceAmount = payment.balanceAmount - paidAmount;
+                payment.balanceAmount = newBalanceAmount;
+                payment.paidAmount += paidAmount;
+    
+                // Update payment status
+                if (newBalanceAmount <= 0) {
+                    payment.paymentStatus = 'paid';
+                } else {
+                    payment.paymentStatus = 'partially_paid';
+                }
+    
                 await payment.save();
-
+    
                 // Create finance record
-                await Finance.create({
+                const financeRecord = new Finance({
                     transactionType: 'income',
                     category: 'sales',
-                    amount: event.data.amount / 100,
-                    description: `Payment received from ${payment.customer.name}`,
+                    amount: paidAmount,
+                    description: `Payment received for sale #${payment.sale._id} from ${payment.customer.name}`,
                     referenceId: payment._id,
-                    referenceModel: 'Payment'
+                    referenceModel: 'Payment',
+                    metadata: {
+                        paystackReference: event.data.reference,
+                        paymentId: payment._id,
+                        saleId: payment.sale._id,
+                    }
                 });
-
-                // Send notification email to business
-                await transporter.sendMail({
-                    to: process.env.BUSINESS_EMAIL,
-                    subject: 'Payment Received',
-                    html: `
-                        <h2>Payment Received</h2>
-                        <p>Customer: ${payment.customer.name}</p>
-                        <p>Amount: ${event.data.amount / 100}</p>
-                        <p>Reference: ${event.data.reference}</p>
-                    `
-                });
+                await financeRecord.save();
+    
+                // Send confirmation emails
+                const messageHtml = generatePaymentSuccessMessage(
+                    payment.customer,
+                    payment.sale,
+                    payment,
+                    product,
+                    event.data.reference
+                );
+    
+                // Send to customer
+                await sendEmail(
+                    payment.customer.email,
+                    `Payment Confirmation - Order #${payment.sale._id}`,
+                    messageHtml
+                );
+    
+                // Send to business
+                await sendEmail(
+                    process.env.BUSINESS_EMAIL,
+                    'Payment Received',
+                    generateBusinessPaymentNotification(payment, event.data)
+                );
             }
-
+    
+            // Handle failed charges
+            else if (event.event === 'charge.failed') {
+                const { paymentId, customerId } = event.data.metadata;
+                
+                const payment = await Payment.findById(paymentId)
+                    .populate('customer')
+                    .populate('sale');
+    
+                if (payment) {
+                    payment.paymentHistory.push({
+                        amount: event.data.amount / 100,
+                        paymentMethod: 'paystack',
+                        paymentStatus: 'failed',
+                        paymentDate: new Date(),
+                        paystackReference: event.data.reference,
+                        metadata: event.data
+                    });
+    
+                    await payment.save();
+    
+                    // Send failure notification
+                    await sendEmail(
+                        payment.customer.email,
+                        `Payment Failed - Order #${payment.sale._id}`,
+                        generatePaymentFailureMessage(payment, event.data)
+                    );
+                }
+            }
+    
             res.sendStatus(200);
         } catch (error) {
             console.error('Webhook error:', error);
@@ -170,7 +226,6 @@ const PaymentController = {
             // Get all completed payments in date range
             const payments = await Payment.find({
                 'paymentHistory.paymentDate': { $gte: start, $lte: end },
-                'paymentHistory.status': 'completed'
             }).populate({
                 path: 'sale',
                 populate: { path: 'productId' }
@@ -194,7 +249,6 @@ const PaymentController = {
 
             payments.forEach(payment => {
                 const completedPayments = payment.paymentHistory.filter(p => 
-                    p.status === 'completed' && 
                     p.paymentDate >= start && 
                     p.paymentDate <= end
                 );
@@ -236,6 +290,38 @@ const PaymentController = {
         } catch (error) {
             console.error('Error generating report:', error);
             res.status(500).json({ error: error.message });
+        }
+    },
+
+    // Download sales report
+    async downloadSalesReport(req, res) {
+        const { startDate, endDate ,format = 'csv'} = req.query;
+
+        if (!startDate || !endDate) {
+            return res.status(400).send('Start date and end date are required.');
+        }
+
+        try {
+            const start = new Date(startDate);
+        const end = new Date(endDate);
+        const salesData = await reportGenerator.generateSalesReport(start, end);
+
+        const filename = `sales_report_${moment(start).format('YYYY-MM-DD')}_to_${moment(end).format('YYYY-MM-DD')}`;
+
+        if (format === 'excel') {
+            const workbook = await reportGenerator.generateExcelReport(salesData, start, end);
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', `attachment; filename=${filename}.xlsx`);
+            await workbook.xlsx.write(res);
+        } else {
+            const csvData = reportGenerator.generateCSVReport(salesData);
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', `attachment; filename=${filename}.csv`);
+            res.send(csvData);
+        }
+        } catch (error) {
+            console.error('Error generating sales report:', error);
+            res.status(500).send('Internal Server Error');
         }
     }
 };

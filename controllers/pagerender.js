@@ -4,23 +4,25 @@ const User = require("../models/user");
 const Sales = require('../models/sales');
 const Finance = require('../models/finance');
 const aggregateDataIntoMonths = require("../utils/aggregate");
+const Customer = require("../models/customer");
 
 const pageRender = {
 
-    async getLogin(req, res){
+    async getLogin(req, res) {
         const alertMessage = req.flash("message");
         const alertStatus = req.flash("status");
 
         const alert = { message: alertMessage, status: alertStatus };
 
-        res.render('login', {alert})
+        res.render('login', { alert })
     },
-    
-    async getDashboard(req, res) {
-        try {    const alertMessage = req.flash("message");
-        const alertStatus = req.flash("status");
 
-        const alert = { message: alertMessage, status: alertStatus };
+    async getDashboard(req, res) {
+        try {
+            const alertMessage = req.flash("message");
+            const alertStatus = req.flash("status");
+
+            const alert = { message: alertMessage, status: alertStatus };
             const totalMaterials = await Materials.find().countDocuments();
             const totalUsers = await User.find().countDocuments();
             const totalSupplies = await Supply.find().countDocuments();
@@ -123,12 +125,12 @@ const pageRender = {
             const alertMessage = req.flash('message');
             const alertStatus = req.flash('status');
             const alert = { message: alertMessage, status: alertStatus };
-    
+
             let { page = 1, limit = 10, startDate, endDate } = req.query;
-    
+
             page = parseInt(page);
             limit = parseInt(limit);
-    
+
             const filter = {};
             if (startDate && endDate) {
                 filter.saleDate = {
@@ -136,19 +138,25 @@ const pageRender = {
                     $lte: new Date(endDate)
                 };
             }
-    
+
             // Fetch sales with pagination
             const sales = await Sales.find(filter)
                 .populate('productId')
+                .populate('customer')
+                .populate('payment')
                 .sort({ saleDate: -1 })
                 .skip((page - 1) * limit)
                 .limit(limit);
-    
+
+            // Count total sales
             const total = await Sales.countDocuments(filter);
-    
+
+            
             const materials = await Materials.find();
-    
+            const customers = await Customer.find();
+
             res.render('sales', {
+                customers,
                 sales,
                 materials,
                 alert,
@@ -157,7 +165,8 @@ const pageRender = {
                 limit,
                 startDate,
                 endDate,
-                title: 'Sales Management'
+                title: 'Sales Management',
+                isEdit: false
             });
         } catch (error) {
             console.error('Error loading sales page:', error);
@@ -182,8 +191,8 @@ const pageRender = {
 
             const totals = await Finance.calculateTotals(startDate, endDate);
 
-            res.render('finance', { 
-                transactions, 
+            res.render('finance', {
+                transactions,
                 totals,
                 alert,
                 title: 'Finance Management'

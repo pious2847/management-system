@@ -25,10 +25,10 @@ const SalesSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    status: {
-        type: String,
-        enum: ['pending', 'completed', 'cancelled'],
-        default: 'completed'
+    payment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Payment',
+        required: true
     }
 }, {
     timestamps: true,
@@ -56,7 +56,7 @@ SalesSchema.pre('save', async function(next) {
 
 // Virtual for formatted price
 SalesSchema.virtual('formattedTotalPrice').get(function() {
-    return this.totalPrice ? `$${this.totalPrice.toFixed(2)}` : '$0.00';
+    return this.totalPrice ? `${this.totalPrice.toFixed(2)}` : '0.00';
 });
 
 const Sales = mongoose.model('Sales', SalesSchema);

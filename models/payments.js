@@ -2,25 +2,13 @@ const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
     customer: {
-        name: {
-            type: String,
-            required: true,
-            trim: true
-        },
-        email: {
-            type: String,
-            required: true,
-            trim: true
-        },
-        phone: {
-            type: String,
-            trim: true
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customer',
+        required: true
     },
     sale: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Sales',
-        required: true
     },
     totalAmount: {
         type: Number,
@@ -32,6 +20,15 @@ const paymentSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
+    paidAmount: {
+        type: Number,
+        default: 0
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['pending', 'paid', 'partially_paid'],
+        default: 'pending'
+    },
     paymentHistory: [{
         amount: {
             type: Number,
@@ -40,17 +37,17 @@ const paymentSchema = new mongoose.Schema({
         },
         paymentMethod: {
             type: String,
-            enum: ['cash', 'momo', 'card', 'paystack'],
+            enum: ['cash', 'card', 'credit'],
             required: true
+        },
+        paymentStatus: {
+            type: String,
+            enum: ['pending', 'paid', 'partially_paid'],
+            default: 'pending'
         },
         paymentDate: {
             type: Date,
             default: Date.now()
-        },
-        status: {
-            type: String,
-            enum: ['pending', 'completed', 'failed'],
-            default: 'pending'
         },
         paystackReference: {
             type: String,
@@ -60,45 +57,20 @@ const paymentSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.Mixed
         }
     }],
-    status: {
-        type: String,
-        enum: ['pending', 'partially_paid', 'completed'],
-        default: 'pending'
-    },
-    dueDate: {
-        type: Date,
-        required: true
-    }
-}, { 
+
+}, {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
 
 // Virtual for total paid amount
-paymentSchema.virtual('paidAmount').get(function() {
+paymentSchema.virtual('totalPaidAmount').get(function () {
     return this.paymentHistory
-        .filter(payment => payment.status === 'completed')
+        .filter(payment => payment.paymentStatus === 'paid')
         .reduce((sum, payment) => sum + payment.amount, 0);
 });
 
-// Pre-save middleware to update status based on payments
-paymentSchema.pre('save', function(next) {
-    const paidAmount = this.paidAmount;
-    
-    if (paidAmount >= this.totalAmount) {
-        this.status = 'completed';
-        this.balanceAmount = 0;
-    } else if (paidAmount > 0) {
-        this.status = 'partially_paid';
-        this.balanceAmount = this.totalAmount - paidAmount;
-    } else {
-        this.status = 'pending';
-        this.balanceAmount = this.totalAmount;
-    }
-    
-    next();
-});
 
 const Payment = mongoose.model('Payment', paymentSchema);
 

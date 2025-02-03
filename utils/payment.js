@@ -1,24 +1,27 @@
 const https = require('https');
-const config = require("../../config");
 
 /**
  * Initiates a payment transaction with Paystack.
  * 
  * This function sends a request to Paystack's API to initialize a payment transaction.
  * It uses the HTTPS module to make a secure POST request to Paystack's server.
+ * The amount is automatically converted from Naira to kobo before sending.
  * 
  * @param {string} email - The email address of the user making the payment.
- * @param {number} amount - The amount to be paid in the smallest currency unit (e.g., kobo for Naira).
+ * @param {number} amount - The amount to be paid in Naira.
  * @param {Object} [metadata={}] - Additional information to be sent with the payment request.
  * @returns {Promise<Object>} A promise that resolves with the payment initialization data from Paystack.
  * @throws {Error} If the payment initialization fails or if there's an error parsing the response.
  */
 function initiatePaystackPayment(email, amount, metadata = {}) {
   return new Promise((resolve, reject) => {
+    // Convert amount from Naira to kobo (multiply by 100)
+    const amountInKobo = Math.round(amount * 100);
+
     // Prepare the request parameters
     const params = JSON.stringify({
       email: email,
-      amount: amount, // Paystack expects amount in the smallest currency unit
+      amount: amountInKobo, // Now sending amount in kobo
       metadata: metadata
     });
 

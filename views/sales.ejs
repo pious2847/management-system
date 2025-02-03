@@ -77,57 +77,52 @@
                                                 class="d-flex flex-wrap justify-content-between align-items-center p-4 bg-white rounded">
                                                 <!-- Title with icon -->
                                                 <div class="d-flex align-items-center">
-                                                    <i class='bx bx-shopping-bag fs-4 text-primary me-2'></i>
-                                                    <h5 class="card-title mb-0 fw-bold text-primary">Sales Records</h5>
+                                                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                                        <i class='bx bx-shopping-bag fs-4 text-primary'></i>
+                                                    </div>
+                                                    <div>
+                                                        <h5 class="card-title mb-1 fw-bold text-primary">Sales Records</h5>
+                                                        <p class="text-muted small mb-0">Manage and track your sales transactions</p>
+                                                    </div>
                                                 </div>
 
                                                 <!-- Actions Container -->
-                                                <div class="d-flex flex-wrap gap-3 align-items-center">
-                                                    <!-- Search Input -->
-                                                    <div class="input-group" style="width: auto; min-width: 250px;">
-                                                        <input type="text"
-                                                            class="form-control shadow-none border border-end-0"
-                                                            id="searchInput" placeholder="Search transactions..."
-                                                            style="height: 42px;">
-                                                        <button
-                                                            class="btn btn-outline-secondary  border border-start-0 bg-white"
-                                                            type="button" style="height: 42px;">
-                                                            <i class='bx bx-search fs-5'></i>
-                                                        </button>
-                                                    </div>
-
+                                                <div class="flex-row row  flex-wrap justify-content-between gap-3 align-items-center ">
+                                                                                     
                                                     <!-- New Sale Button -->
                                                     <button type="button"
-                                                        class="btn btn-primary d-flex align-items-center gap-2 px-4"
-                                                        style="height: 42px;" data-bs-toggle="modal"
-                                                        data-bs-target="#addSaleModal">
+                                                            class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#addSaleModal">
                                                         <i class='bx bx-plus fs-5'></i>
                                                         <span class="fw-semibold">New Sale</span>
                                                     </button>
-
+                                    
                                                     <!-- Export Dropdown -->
                                                     <div class="dropdown">
-                                                        <button
-                                                            class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2"
-                                                            type="button" data-bs-toggle="dropdown"
-                                                            aria-expanded="false" style="height: 42px;">
+                                                        <button class="btn btn-outline-secondary d-flex align-items-center gap-2 px-4 py-2"
+                                                                type="button" 
+                                                                data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
                                                             <i class='bx bx-export fs-5'></i>
-                                                            <span>Export</span>
+                                                            <span class="fw-medium">Export</span>
+                                                            <i class='bx bx-chevron-down fs-5'></i>
                                                         </button>
-                                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-light"
-                                                            style="min-width: 200px;">
+                                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-light py-2">
                                                             <li>
-                                                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2"
-                                                                    href="#" onclick="exportData('csv')">
-                                                                    <i class='bx bx-file fs-5'></i>
-                                                                    Export as CSV
+                                                                <a class="dropdown-item px-4 py-2 d-flex align-items-center gap-2" 
+                                                                   href="#" 
+                                                                   onclick="exportData('csv')">
+                                                                    <i class='bx bx-file fs-5 text-muted'></i>
+                                                                    <span>Export as CSV</span>
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2"
-                                                                    href="#" onclick="exportData('pdf')">
-                                                                    <i class='bx bx-file-pdf fs-5'></i>
-                                                                    Export as PDF
+                                                                <a class="dropdown-item px-4 py-2 d-flex align-items-center gap-2" 
+                                                                   href="#" 
+                                                                   onclick="exportData('pdf')">
+                                                                    <i class='bx bx-file-pdf fs-5 text-muted'></i>
+                                                                    <span>Export as PDF</span>
                                                                 </a>
                                                             </li>
                                                         </ul>
@@ -143,6 +138,8 @@
                                                             <th>Product</th>
                                                             <th>Quantity</th>
                                                             <th>Total Price</th>
+                                                            <th>Amount Paid</th>
+                                                            <th>Balance</th>
                                                             <th>Customer</th>
                                                             <th>Date</th>
                                                             <th>Status</th>
@@ -159,19 +156,27 @@
                                                                     <%= sale.quantitySold %>
                                                                 </td>
                                                                 <td>
-                                                                    <%= sale.totalPrice ? `₵
-                                                                        ${sale.totalPrice.toFixed(2)}` : '₵0.00' %>
+                                                                    <%= sale.payment.totalAmount ? `₵
+                                                                        ${sale.payment.totalAmount.toFixed(2)}` : '₵0.00' %>
                                                                 </td>
                                                                 <td>
-                                                                    <%= sale.customerName %>
+                                                                    <%= sale.payment.paidAmount ? `₵
+                                                                        ${sale.payment.paidAmount.toFixed(2)}` : '₵0.00' %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= sale.payment.balanceAmount ? `₵
+                                                                        ${sale.payment.balanceAmount.toFixed(2)}` : '₵0.00' %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= sale.customer.name %>
                                                                 </td>
                                                                 <td>
                                                                     <%= new Date(sale.saleDate).toLocaleDateString() %>
                                                                 </td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge bg-<%= sale.status === 'completed' ? 'success' : (sale.status === 'pending' ? 'warning' : 'danger') %>">
-                                                                        <%= sale.status %>
+                                                                        class="badge bg-<%= sale.payment.paymentStatus === 'completed' ? 'success' : (sale.payment.paymentStatus === 'pending' ? 'warning' : 'danger') %>">
+                                                                        <%= sale.payment.paymentStatus %>
                                                                     </span>
                                                                 </td>
                                                                 <td>
@@ -179,8 +184,15 @@
                                                                         <button class="btn btn-sm btn-info edit-sale"
                                                                             data-sale-id="<%= sale._id %>"
                                                                             data-product-id="<%= sale.productId._id %>"
+                                                                            data-customer-id="<%= sale.customer._id %>"
                                                                             data-quantity="<%= sale.quantitySold %>"
-                                                                            data-customer="<%= sale.customerName %>"
+                                                                            data-paid-amount="<%= sale.paidAmount ? sale.paidAmount : 0 %>"
+                                                                            data-total-price="<%= sale.totalPrice ? sale.totalPrice : 0 %>"
+                                                                            data-name="<%= sale.customer.name %>"
+                                                                            data-email="<%= sale.customer.email %>"
+                                                                            data-phone="<%= sale.customer.phone %>"
+                                                                            data-payment-type="<%= sale.paymentType %>"
+                                                                            data-status="<%= sale.status %>"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#editSaleModal">
                                                                             <i class='bx bx-edit-alt'></i>
@@ -200,7 +212,6 @@
                                                 </table>
                                             </div>
 
-                                            <!-- Pagination -->
                                             <!-- Pagination -->
                                             <nav aria-label="Sales navigation"
                                                 class="d-flex justify-content-between align-items-center mt-3">
@@ -247,92 +258,281 @@
 
             <!-- Add Sale Modal -->
             <div class="modal fade" id="addSaleModal" tabindex="-1">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Add New Sale</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal">X</button>
                         </div>
                         <form action="/api/sales/create" method="POST">
                             <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="productId" class="form-label">Product</label>
-                                    <select class="form-control" id="productId" name="productId" required>
-                                        <option value="">Select Product</option>
-                                        <% materials.forEach(function(product) { %>
-                                            <option value="<%= product._id %>" data-price="<%= product.unitPrice %>"
-                                                data-stock="<%= product.stock %>">
-                                                <%= product.name %> - ₵<%= product.unitPrice %> (Stock: <%=
-                                                            product.stock %>)
-                                            </option>
-                                            <% }); %>
-                                    </select>
+                                <div class="row g-3">
+                                    <!-- Product Selection -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="productId" class="form-label fw-semibold">Product</label>
+                                            <select class="form-control" id="productId" name="productId" required>
+                                                <option value="">Select Product</option>
+                                                <% materials.forEach(function(product) { %>
+                                                    <option value="<%= product._id %>"
+                                                        data-price="<%= product.unitPrice %>"
+                                                        data-stock="<%= product.stock %>">
+                                                        <%= product.name %> - ₵<%= product.unitPrice %> (Stock: <%=
+                                                                    product.stock %>)
+                                                    </option>
+                                                    <% }); %>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Customer Selection -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="customerId" class="form-label fw-semibold">Customer</label>
+                                            <select class="form-control" id="customerId" name="customerId">
+                                                <option value="">Select Customer</option>
+                                                <% customers.forEach(function(customer) { %>
+                                                    <option value="<%= customer._id %>">
+                                                        <%= customer.name %> (Phone: <%= customer.phone %>)
+                                                    </option>
+                                                    <% }); %>
+                                            </select>
+                                            <p class="form-text text-danger display-6" style="font-size: 10px;">
+                                                Select a customer if they are an existing customer; otherwise, provide
+                                                customer details
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quantity -->
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="quantitySold" class="form-label fw-semibold">Quantity</label>
+                                            <input type="number" class="form-control" id="quantitySold"
+                                                name="quantitySold" min="1" required placeholder="Enter quantity"">
+                                            <div class=" form-text">Available stock: <span id="availableStock">-</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="quantitySold" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control" id="quantitySold" name="quantitySold"
-                                        min="1" required>
-                                    <div class="form-text text-muted">Available stock: <span
-                                            id="availableStock">-</span></div>
+                                <div class="col-md-12">
+                                    <h5>Customer Information </h5>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="customerName" class="form-label">Customer Name</label>
-                                    <input type="text" class="form-control" id="customerName" name="customerName"
-                                        required>
+                                <!-- Customer Information -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name" class="form-label fw-semibold">Customer Name</label>
+                                        <input type="text" class="form-control" id="name" name="name" >
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Total Price</label>
-                                    <div class="form-control" id="totalPrice">₵0.00</div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phone" class="form-label fw-semibold">Customer Phone</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" >
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="email" class="form-label fw-semibold">Customer Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" >
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <h5>Payment Information </h5>
+                                </div>
+                                <!-- Payment Information -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold">Payment Method</label>
+                                        <select class="form-control" name="paymentMethod" id="paymentMethod" required>
+                                            <option value="" disabled>Select Payment Method</option>
+                                            <option value="cash">Cash</option>
+                                            <option value="card">Card</option>
+                                            <option value="credit">Purchase On Credit</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold">Payment Status</label>
+                                        <select class="form-control" name="paymentStatus" id="paymentStatus" required>
+                                            <option value="" disabled>Select Payment Status</option>
+                                            <option value="paid">Paid</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="partially_paid">Partially Paid</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="paidAmount" class="form-label fw-semibold">Amount Paid</label>
+                                        <input type="number" class="form-control" id="paidAmount" name="paidAmount"
+                                            >
+                                        <p class="form-text text-danger display-6" style="font-size: 10px;">
+
+                                            Enter the amount paid only if the user makes a partial payment or purchases
+                                            a product on credit.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Total Price -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label fw-semibold">Total Price</label>
+                                        <div class="form-control bg-light" id="totalPrice">₵0.00</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Create Sale</button>
-                            </div>
-                        </form>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Sale</button>
+                    </div>
+                    </form>
                 </div>
+            </div>
             </div>
 
             <!-- Edit Sale Modal -->
             <div class="modal fade" id="editSaleModal" tabindex="-1">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Edit Sale</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal">X</button>
                         </div>
                         <form id="editSaleForm" method="POST">
                             <div class="modal-body">
-                                <input type="hidden" id="editSaleId" name="saleId">
-                                <div class="mb-3">
-                                    <label for="editProductId" class="form-label">Product</label>
-                                    <select class="form-control" id="editProductId" name="productId" required>
-                                        <option value="">Select Product</option>
-                                        <% materials.forEach(function(product) { %>
-                                            <option value="<%= product._id %>" data-price="<%= product.unitPrice %>"
-                                                data-stock="<%= product.stock %>">
-                                                <%= product.name %> - ₵<%= product.unitPrice %> (Stock: <%=
-                                                            product.stock %>)
-                                            </option>
-                                            <% }); %>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editQuantitySold" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control" id="editQuantitySold" name="quantitySold"
-                                        min="1" required>
-                                    <div class="form-text text-muted">Available stock: <span
-                                            id="editAvailableStock">-</span></div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editCustomerName" class="form-label">Customer Name</label>
-                                    <input type="text" class="form-control" id="editCustomerName" name="customerName"
-                                        required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Total Price</label>
-                                    <div class="form-control" id="editTotalPrice">₵0.00</div>
+                                <div class="row g-3">
+                                    <input type="hidden" id="editSaleId" name="saleId">
+                                    <div class="col-md-6">
+                                        <label for="editProductId" class="form-label">Product</label>
+                                        <select class="form-control" id="editProductId" name="productId" required>
+                                            <option value="">Select Product</option>
+                                            <% materials.forEach(function(product) { %>
+                                                <option value="<%= product._id %>" data-price="<%= product.unitPrice %>"
+                                                    data-stock="<%= product.stock %>">
+                                                    <%= product.name %> - ₵<%= product.unitPrice %> (Stock: <%=
+                                                                product.stock %>)
+                                                </option>
+                                                <% }); %>
+                                        </select>
+                                    </div>
+                                    <!-- Customer Selection -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="editCustomerId" class="form-label fw-semibold">Customer</label>
+                                            <select class="form-control" id="editCustomerId" name="customerId">
+                                                <option value="">Select Customer</option>
+                                                <% customers.forEach(function(customer) { %>
+                                                    <option value="<%= customer._id %>">
+                                                        <%= customer.name %> (Phone: <%= customer.phone %>)
+                                                    </option>
+                                                    <% }); %>
+                                            </select>
+                                            <p class="form-text text-danger" style="font-size: 10px;">
+                                                Select a customer if they are an existing customer; otherwise, provide
+                                                customer details.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quantity -->
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="editQuantitySold"
+                                                class="form-label fw-semibold">Quantity</label>
+                                            <input type="number" class="form-control" id="editQuantitySold"
+                                                name="quantitySold" min="1" required>
+                                            <div class="form-text">Available stock: <span
+                                                    id="editAvailableStock">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <h5>Customer Information </h5>
+                                    </div>
+
+                                    <!-- Customer Information -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="editName" class="form-label fw-semibold">Customer Name</label>
+                                            <input type="text" class="form-control" id="editName" name="name" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="editPhone" class="form-label fw-semibold">Customer Phone</label>
+                                            <input type="tel" class="form-control" id="editPhone" name="phone" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="editEmail" class="form-label fw-semibold">Customer Email</label>
+                                            <input type="email" class="form-control" id="editEmail" name="email"
+                                                required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <h5>Payment Information </h5>
+                                    </div>
+
+                                    <!-- Payment Information -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label fw-semibold">Payment Method</label>
+                                            <select class="form-control" name="paymentMethod" id="editPaymentMethod"
+                                                required>
+                                                <option value="" disabled>Select Payment Method</option>
+                                                <option value="cash">Cash</option>
+                                                <option value="card">Card</option>
+                                                <option value="credit">Purchase On Credit</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label fw-semibold">Payment Status</label>
+                                            <select class="form-control" name="paymentStatus" id="editPaymentStatus"
+                                                required>
+                                                <option value="" disabled>Select Payment Status</option>
+                                                <option value="paid">Paid</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="partially_paid">Partially Paid</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="editPaidAmount" class="form-label fw-semibold">Amount
+                                                Paid</label>
+                                            <input type="number" class="form-control" id="editPaidAmount"
+                                                name="paidAmount" >
+                                            <p class="form-text text-danger" style="font-size: 10px;">
+                                                Enter the amount paid only if the user makes a partial payment or
+                                                purchases
+                                                a product on credit.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Total Price -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label fw-semibold">Total Price</label>
+                                            <div class="form-control bg-light" id="editTotalPrice">₵0.00</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -342,6 +542,7 @@
                         </form>
                     </div>
                 </div>
+            </div>
             </div>
 
             <!-- Delete Sale Modal -->
@@ -477,8 +678,115 @@
                     // Load initial data
                 });
             </script>
-
             <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Calculate total price for new sale
+                    const calculateTotal = (quantity, price) => {
+                        return quantity && price ? (quantity * price).toFixed(2) : '0.00';
+                    };
+
+                    // Handle new sale
+                    const productSelect = document.getElementById('productId');
+                    const quantityInput = document.getElementById('quantitySold');
+                    const totalPriceDiv = document.getElementById('totalPrice');
+                    const stockSpan = document.getElementById('availableStock');
+
+                    const updateNewSaleTotal = () => {
+                        const selectedOption = productSelect.selectedOptions[0];
+                        const price = selectedOption ? parseFloat(selectedOption.dataset.price) : 0;
+                        const quantity = parseInt(quantityInput.value) || 0;
+                        totalPriceDiv.textContent = `₵${calculateTotal(quantity, price)}`;
+                        stockSpan.textContent = selectedOption ? selectedOption.dataset.stock : '-';
+                    };
+
+                    productSelect.addEventListener('change', updateNewSaleTotal);
+                    quantityInput.addEventListener('input', updateNewSaleTotal);
+
+                    // Handle edit sale
+                    const editButtons = document.querySelectorAll('.edit-sale');
+                    editButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            const saleId = button.dataset.saleId;
+                            const productId = button.dataset.productId;
+                            const quantity = button.dataset.quantity;
+                            const customer = button.dataset.customer;
+                            const paymentMethod = button.dataset.paymentMethod;
+                            const paymentStatus = button.dataset.paymentStatus;
+                            const paidAmount = button.dataset.paidAmount;
+
+                            document.getElementById('editSaleId').value = saleId;
+                            document.getElementById('editProductId').value = productId;
+                            document.getElementById('editQuantitySold').value = quantity;
+                            document.getElementById('editCustomerName').value = customer;
+                            document.getElementById('editPaymentMethod').value = paymentMethod;
+                            document.getElementById('editPaymentStatus').value = paymentStatus;
+                            document.getElementById('editPaidAmount').value = paidAmount;
+
+                            // Update form action
+                            const editForm = document.getElementById('editSaleForm');
+                            editForm.action = `/api/sales/${saleId}`;
+                            editForm.method = 'PUT';
+
+                            // Calculate total
+                            const selectedOption = document.getElementById('editProductId').selectedOptions[0];
+                            const price = selectedOption ? parseFloat(selectedOption.dataset.price) : 0;
+                            document.getElementById('editTotalPrice').textContent = `₵${calculateTotal(quantity, price)}`;
+                            document.getElementById('editAvailableStock').textContent = selectedOption ? selectedOption.dataset.stock : '-';
+                        });
+                    });
+
+                    // Handle edit sale calculations
+                    const editProductSelect = document.getElementById('editProductId');
+                    const editQuantityInput = document.getElementById('editQuantitySold');
+                    const editTotalPriceDiv = document.getElementById('editTotalPrice');
+                    const editStockSpan = document.getElementById('editAvailableStock');
+
+                    const updateEditSaleTotal = () => {
+                        const selectedOption = editProductSelect.selectedOptions[0];
+                        const price = selectedOption ? parseFloat(selectedOption.dataset.price) : 0;
+                        const quantity = parseInt(editQuantityInput.value) || 0;
+                        editTotalPriceDiv.textContent = `₵${calculateTotal(quantity, price)}`;
+                        editStockSpan.textContent = selectedOption ? selectedOption.dataset.stock : '-';
+                    };
+
+                    editProductSelect.addEventListener('change', updateEditSaleTotal);
+                    editQuantityInput.addEventListener('input', updateEditSaleTotal);
+
+                    // Handle delete sale
+                    const deleteButtons = document.querySelectorAll('.delete-sale');
+                    const confirmDeleteButton = document.getElementById('confirmDelete');
+                    let saleToDelete = null;
+
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            saleToDelete = button.dataset.saleId;
+                        });
+                    });
+
+                    confirmDeleteButton.addEventListener('click', async () => {
+                        if (saleToDelete) {
+                            try {
+                                const response = await fetch(`/api/sales/${saleToDelete}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                // Close the modal and refresh the page
+                                const deleteModal = new bootstrap.Modal(document.getElementById('deleteSaleModal'));
+                                deleteModal.hide();
+                                window.location.reload();
+
+                            } catch (error) {
+                                console.error('Error:', error);
+                                alert('Error deleting sale');
+                            }
+                        }
+                    });
+                });
+
+            </script>
+            <!-- <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     // Calculate total price for new sale
                     const calculateTotal = (quantity, price) => {
@@ -579,7 +887,7 @@
                     });
 
                 });
-            </script>
+            </script> -->
             <%- include('layouts/footer') %>
 
     </body>

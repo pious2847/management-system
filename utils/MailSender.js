@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
  */
 const sendEmail = async (recipient, subject, message, ) => {
   const mailOptions = {
-    from: process.env.AUTH_EMAIL,
+    from: `"Frefat Ventures" <${process.env.AUTH_EMAIL}>`,
     to: recipient,
     subject: subject,
     html: `${message}`,
@@ -52,7 +52,7 @@ const sendEmail = async (recipient, subject, message, ) => {
  */
 const sendApprovalEmail = async ( recipient, subject, message,) => {
   const mailOptions = {
-    from: process.env.AUTH_EMAIL,
+    from: `"Frefat Ventures" <${process.env.AUTH_EMAIL}>`,
     to: recipient,
     subject: subject,
     html: `

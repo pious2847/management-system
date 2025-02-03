@@ -1,238 +1,206 @@
-const generateApprovalMessage = (instructor, course) => {
+const generatePaymentConfirmationMessage = (customer, sale, payment, product) => {
+  const paymentDate = new Date(payment.paymentHistory[0].paymentDate).toDateString();
+  const paymentStatus = payment.paymentHistory[0].paymentStatus;
+  const totalAmount = payment.totalAmount;
+  const paidAmount = payment.paidAmount;
+  const balanceAmount = payment.balanceAmount;
+  
+  // Different header and message based on payment method
+  let headerText = '';
+  let statusMessage = '';
+  let headerColor = '';
+  
+  switch(paymentStatus) {
+    case 'paid':
+      headerText = 'Payment Confirmation - Paid in Full';
+      statusMessage = 'Your payment has been received in full';
+      headerColor = '#4CAF50'; // Green
+      break;
+    case 'partially_paid':
+      headerText = 'Partial Payment Confirmation';
+      statusMessage = 'Your partial payment has been received';
+      headerColor = '#FF9800'; // Orange
+      break;
+    case 'pending':
+      headerText = 'Credit Purchase Confirmation';
+      statusMessage = 'Your credit purchase has been recorded';
+      headerColor = '#2196F3'; // Blue
+      break;
+  }
+
   return `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-    <header style="background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0;">
-      <h1 style="margin: 0; font-size: 24px;">Course Approved!</h1>
-    </header>
-    
-    <main style="padding: 20px;">
-      <p style="font-size: 16px; line-height: 1.5; color: #333;">
-        Dear ${instructor.fullName},
-      </p>
-      
-      <p style="font-size: 16px; line-height: 1.5; color: #333;">
-        We are pleased to inform you that your course, <strong>"${
-          course.title
-        }"</strong>, has been approved and is now live on our platform.
-      </p>
-      
-      <p style="font-size: 16px; line-height: 1.5; color: #333;">
-        This is an exciting milestone, and we commend you for your hard work in creating valuable content for our learners.
-      </p>
-      
-      <div style="background-color: #f9f9f9; border-left: 4px solid #4CAF50; margin: 20px 0; padding: 15px;">
-        <p style="font-size: 16px; line-height: 1.5; color: #333; margin: 0;">
-          <strong>Course Details:</strong><br>
-          Title: ${course.title}<br>
-          ID: ${course._id}<br>
-          Approval Date: ${new Date().toDateString()}
-        </p>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${headerText}</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background-color: ${headerColor}; color: white; padding: 20px; text-align: center; border-radius: 5px;">
+          <h1 style="margin: 0; font-size: 24px;">${headerText}</h1>
       </div>
-    
-    </main>
-    
-    <footer style="background-color: #f1f1f1; color: #666; padding: 20px; text-align: center; font-size: 14px; border-radius: 0 0 5px 5px;">
-      <p style="margin: 0;">
-        Thank you for being a valued instructor on our platform.<br>
-        If you have any questions, please don't hesitate to contact our support team.
-      </p>
-    </footer>
-  </div>
-    `;
+      
+      <div style="padding: 20px;">
+          <p>Dear ${customer.name},</p>
+          
+          <p>${statusMessage} for your recent purchase.</p>
+          
+          <div style="background-color: #f8f9fa; border-left: 4px solid ${headerColor}; padding: 15px; margin: 20px 0;">
+              <h3 style="margin-top: 0;">Transaction Details:</h3>
+              <p style="margin: 0; font-size: 16px; line-height: 1.5;">
+                  <strong>Transaction Date:</strong> ${paymentDate}<br>
+                  <strong>Product:</strong> ${product.name}<br>
+                  <strong>Quantity:</strong> ${sale.quantitySold} ${product.unit}(s)<br>
+                  <strong>Total Amount:</strong> Gh₵ ${totalAmount.toLocaleString()}<br>
+                  <strong>Payment Method:</strong> ${paymentStatus.replace('_', ' ').toUpperCase()}<br>
+                  ${paymentStatus === 'partially_paid' || paymentStatus === 'credit' ? 
+                    `<strong>Amount Paid:</strong> Gh₵ ${paidAmount.toLocaleString()}<br>
+                     <strong>Balance Due:</strong> Gh₵ ${balanceAmount.toLocaleString()}<br>` : ''}
+              </p>
+          </div>
+          
+          ${paymentStatus === 'partially_paid' || paymentStatus === 'pending' ? `
+          <div style="background-color: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #ff9800;">Payment Notice:</h3>
+              <p>Please note that there is a remaining balance of <strong>Gh₵ ${balanceAmount.toLocaleString()}</strong> to be paid.</p>
+              <p>Kindly ensure to clear your balance within the agreed timeframe.</p>
+          </div>
+          ` : ''}
+          
+          <p>Thank you for your business! If you have any questions about this transaction, please don't hesitate to contact us.</p>
+          
+          <p>Best regards,<br>Frefat Ventures</p>
+      </div>
+      
+      <footer style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666; text-align: center;">
+          <p>This is an automated message. Please do not reply directly to this email.</p>
+          <p>
+              Frefat Ventures<br>
+              Address Line 1<br>
+              City, State, Country<br>
+              Phone: +1234567890
+          </p>
+      </footer>
+  </body>
+  </html>
+  `;
 };
+const generatePaymentInitializationMessage = (customer, sale, payment, product, initializePayment) => {
+  const dueDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toDateString(); // 24 hours from now
+  const paymentLink = initializePayment.authorization_url;
+  const paymentMethod = payment.paymentHistory[0].paymentMethod;
+  const totalAmount = payment.totalAmount;
+  const paidAmount = payment.paidAmount || 0;
+  const remainingAmount = paymentMethod === 'partially_paid' ? 
+    payment.balanceAmount : 
+    totalAmount;
 
-const generateWelcomeMessage = (user) => {
   return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Digital Madrasah</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-    <h1 style="color: #4a5568;">Welcome to Digital Madrasah - Your Journey in Islamic Learning Begins!</h1>
-    
-    <p>Dear ${user.fullName},</p>
-    
-    <p>Assalamu Alaikum (Peace be upon you),</p>
-    
-    <p>We are thrilled to welcome you to Digital Madrasah, your new home for enriching Islamic education. Thank you for taking the first step on this blessed journey of knowledge and spiritual growth.</p>
-    
-    <h2 style="color: #2d3748;">Registration Confirmation</h2>
-    <p>Your account has been successfully created with the email address: ${user.email}</p>
-    
-    <h2 style="color: #2d3748;">Next Steps</h2>
-    <ol>
-        <li><strong>Complete Your Profile</strong>: Enhance your learning experience by updating your profile. This helps us tailor our recommendations to your interests and goals.</li>
-        <li><strong>Explore Our Courses</strong>: Browse through our diverse catalog of Islamic courses. From Quranic studies to Islamic history, we offer a wide range of topics to cater to all levels of learners.</li>
-        <li><strong>Stay Tuned</strong>: We're currently in our pre-launch phase. Keep an eye on your inbox for our official launch announcement, where we'll unveil our full suite of features and courses.</li>
-    </ol>
-    
-    <h2 style="color: #2d3748;">What You Can Expect From Us</h2>
-    <ul>
-        <li>High-quality, authentic Islamic courses</li>
-        <li>Expert instructors and scholars</li>
-        <li>A supportive learning community</li>
-        <li>Regular updates on new courses and features</li>
-    </ul>
-    
-    <h2 style="color: #2d3748;">Need Help?</h2>
-    <p>If you have any questions or need assistance, please don't hesitate to reach out to our support team at support@digitalmadrasah.com.</p>
-    
-    <p>May Allah (SWT) bless your journey in seeking knowledge.</p>
-    
-    <div style="font-style: italic; border-left: 3px solid #4a5568; padding-left: 10px; margin: 20px 0;">
-        Remember, the Prophet Muhammad (peace be upon him) said: "Whoever follows a path in pursuit of knowledge, Allah will make easy for him a path to Paradise." (Sahih Muslim)
-    </div>
-    
-    <p>We look forward to being a part of your Islamic learning journey.</p>
-    
-    <p>Jazak Allah Khair (May Allah reward you with goodness),</p>
-    
-    <p>The Digital Madrasah Team</p>
-    
-    <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px; font-size: 0.9em; color: #718096;">
-        <p>Digital Madrasah<br>
-        https://digitalmadrasah.vercel.app<br>
-        [Social Media Links]</p>
-        
-        <p>If you didn't create an account on our platform, please ignore this email or contact us immediately.</p>
-    </div>
-</body>
-</html>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Payment Required - Your Recent Purchase</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background-color: #2196F3; color: white; padding: 20px; text-align: center; border-radius: 5px;">
+          <h1 style="margin: 0; font-size: 24px;">Payment Required</h1>
+      </div>
+      
+      <div style="padding: 20px;">
+          <p>Dear ${customer.name},</p>
+          
+          <p>Thank you for your recent purchase. This email contains important payment information and instructions.</p>
+          
+          <div style="background-color: #f8f9fa; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0;">
+              <h3 style="margin-top: 0;">Purchase Details:</h3>
+              <p style="margin: 0; font-size: 16px; line-height: 1.5;">
+                  <strong>Product:</strong> ${product.name}<br>
+                  <strong>Quantity:</strong> ${sale.quantitySold} ${product.unit}(s)<br>
+                  <strong>Total Amount:</strong> Gh₵ ${totalAmount.toLocaleString()}<br>
+                  ${paymentMethod === 'partially_paid' ? 
+                    `<strong>Amount Already Paid:</strong> Gh₵ ${paidAmount.toLocaleString()}<br>
+                     <strong>Remaining Amount:</strong> Gh₵ ${remainingAmount.toLocaleString()}<br>` : ''}
+                  <strong>Payment Due:</strong> ${dueDate}
+              </p>
+          </div>
+
+          <div style="background-color: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0;">
+              <h3 style="margin-top: 0;">Payment Instructions:</h3>
+              <p style="margin-bottom: 15px;">To complete your payment, please click the secure payment link below:</p>
+              
+              <div style="text-align: center; margin: 20px 0;">
+                  <a href="${paymentLink}" 
+                     style="background-color: #2196F3; 
+                            color: white; 
+                            padding: 12px 25px; 
+                            text-decoration: none; 
+                            border-radius: 5px; 
+                            font-weight: bold;
+                            display: inline-block;">
+                      Make Payment Now
+                  </a>
+              </div>
+              
+              <p style="font-size: 14px; color: #666; margin-top: 15px;">
+                  Note: This payment link will expire in 24 hours. Please complete your payment before the due date.
+              </p>
+          </div>
+          
+          <div style="background-color: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #ff9800;">Important Information:</h3>
+              <ul style="margin: 0; padding-left: 20px;">
+                  <li>Payment should be completed before ${dueDate}</li>
+                  <li>The payment link is unique to your purchase</li>
+                  <li>For security reasons, the link will expire after 24 hours</li>
+                  ${paymentMethod === 'partially_paid' ? 
+                    `<li>This payment will complete your remaining balance of Gh₵ ${remainingAmount.toLocaleString()}</li>` : ''}
+              </ul>
+          </div>
+          
+          <p>If you experience any issues with the payment process or have questions, please don't hesitate to contact our support team.</p>
+          
+          <p>Best regards,<br>Frefat Ventures</p>
+      </div>
+      
+      <footer style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666; text-align: center;">
+          <p>This is an automated message. Please do not reply directly to this email.</p>
+          <p>
+              Frefat Ventures<br>
+              Address Line 1<br>
+              City, State, Country<br>
+              Phone: +1234567890
+          </p>
+      </footer>
+  </body>
+  </html>
   `;
 };
 
-const generateGeneralMessage = (user, ComposedMessage) => {
+function generateBusinessPaymentNotification(payment, paymentData) {
   return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Digital Madrasah</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-    <h1 style="color: #4a5568;">Welcome to Digital Madrasah - Your Journey in Islamic Learning Begins!</h1>
-    
-    <p>Dear ${user.fullName},</p>
-    
-    <p>Assalamu Alaikum (Peace be upon you),</p>
-    
-    <p>${ComposedMessage}</p>
-   
-    
-    <p>Jazak Allah Khair (May Allah reward you with goodness),</p>
-    
-    <p>The Digital Madrasah Team</p>
-    
-    <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px; font-size: 0.9em; color: #718096;">
-        <p>Digital Madrasah<br>
-        https://digitalmadrasah.vercel.app<br>
-        [Social Media Links]</p>
-        
-        <p>If you didn't create an account on our platform, please ignore this email or contact us immediately.</p>
-    </div>
-</body>
-</html>
+      <h2>Payment Received</h2>
+      <p><strong>Customer:</strong> ${payment.customer.name}</p>
+      <p><strong>Amount:</strong> ${paymentData.amount / 100}</p>
+      <p><strong>Reference:</strong> ${paymentData.reference}</p>
+      <p><strong>Order ID:</strong> ${payment.sale._id}</p>
+      <p><strong>Payment Status:</strong> ${payment.paymentStatus}</p>
+      <p><strong>Balance Remaining:</strong> ${payment.balanceAmount}</p>
   `;
-};
-
-const generateAccountVerification= (user, verificationCode) => {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Digital Madrasah</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h2>Verify Your Digital Madrasah Account</h2>
-      <p>Dear ${user.fullName},</p>
-      
-      <p>Thank you for registering with Digital Madrasah. To complete your account setup, please verify your email address by clicking the link below:</p>
-      
-        <p style="color: #555; font-size: 16px;"><b>Verification Code:</b> <span style="style="
-          background-color: #3498db;
-          color: white;
-          padding: 12px 25px;
-          text-decoration: none;
-          border-radius: 5px;
-          display: inline-block;
-        ">${verificationCode}</span></p>
-
-
-      <p>This verification code will expire in 24 hours.</p>
-      
-      <p>If you did not create an account, please disregard this email.</p>
-      
-      <p>Best regards,<br>Digital Madrasah Support Team</p>
-</body>
-</html>
-  `;
-};
-
-const generatePasswordResetConfirmation = (user) => {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Reset Confirmation - Digital Madrasah</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-    <h2>Password Reset Confirmation</h2>
-    <p>Dear ${user.fullName},</p>
-    
-    <p>This email confirms that your password for your Digital Madrasah account has been successfully changed.</p>
-    
-    <div style="
-      background-color: #f8f9fa;
-      border-left: 4px solid #28a745;
-      padding: 15px;
-      margin: 20px 0;
-    ">
-      <p style="margin: 0; color: #28a745;">✓ Your password has been successfully updated</p>
-    </div>
-
-    <p>If you did not make this change, please contact our support team immediately or reset your password using the password reset option on our login page.</p>
-    
-    <p>For security reasons, we recommend:</p>
-    <ul style="padding-left: 20px;">
-      <li>Sign out of all other devices</li>
-      <li>Enable two-factor authentication if you haven't already</li>
-      <li>Review your recent account activity</li>
-    </ul>
-
-    <p>Best regards,<br>Digital Madrasah Support Team</p>
-    
-    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-    <p style="font-size: 12px; color: #666;">
-      This is an automated message, please do not reply to this email. If you need assistance, please contact our support team.
-    </p>
-</body>
-</html>
-  `;
-};
-// Generate OTP SMS message
-const generateOTPMessage = (user, otp) => {
-  return `Your Digital Madrasah verification code is ${otp}. 
-This code will expire in 10 minutes. 
-Do not share this code with anyone.`;
 }
 
+// Helper function for payment failure message
+function generatePaymentFailureMessage(payment, paymentData) {
+  return `
+      <h2>Payment Failed</h2>
+      <p><strong>Order ID:</strong> ${payment.sale._id}</p>
+      <p><strong>Amount:</strong> ${paymentData.amount / 100}</p>
+      <p><strong>Reference:</strong> ${paymentData.reference}</p>
+      <p><strong>Reason:</strong> ${paymentData.gateway_response}</p>
+      <p>Please try again or contact support if you need assistance.</p>
+  `;
+}
 
-// Generate account verification SMS
-const generateVerificationSMS = (user, verificationLink) => {
-  return `Verify your Digital Madrasah account:
-Click ${verificationLink} to complete registration.
-This link expires in 24 hours.`;
-};
-
-
-
-
-module.exports = { generateApprovalMessage, generateWelcomeMessage,generateGeneralMessage, generateVerificationSMS, generateOTPMessage , generateAccountVerification, generatePasswordResetConfirmation};
+module.exports = { generatePaymentConfirmationMessage ,generatePaymentInitializationMessage,generatePaymentFailureMessage,generateBusinessPaymentNotification};
