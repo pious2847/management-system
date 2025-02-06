@@ -10,45 +10,55 @@
   </div>
   <ul class="nav-links">
     <li class="nav-item">
-        <a href="/dashboard" class="nav-link">
+        <a class="nav-link  <%= path === '/dashboard' ? 'active' : '' %>" href="/dashboard">
             <i class='bx bx-grid-alt'></i>
             <span class="link-text">Overview</span>
         </a>
     </li>
     <li class="nav-item">
-        <a href="/dashboard/materials" class="nav-link">
+        <a class="nav-link <%= path === '/dashboard/materials' ? 'active' : '' %>" href="/dashboard/materials">
             <i class='bx bx-store-alt'></i>
             <span class="link-text">Materials</span>
         </a>
     </li>
     <li class="nav-item">
-        <a href="/dashboard/supplies" class="nav-link">
+        <a class="nav-link <%= path === '/dashboard/supplies' ? 'active' : '' %>" href="/dashboard/supplies">
             <i class='bx bx-package'></i>
             <span class="link-text">Supplies</span>
         </a>
     </li>
+
     <li class="nav-item">
-        <a href="/dashboard/sales" class="nav-link">
-            <i class='bx bx-cart'></i>
-            <span class="link-text">Sales</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a href="/dashboard/finance" class="nav-link">
-            <i class='bx bx-wallet' ></i>
-            <span class="link-text">Finances</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a href="/dashboard/low-stock" class="nav-link">
+        <a class="nav-link <%= path === '/dashboard/low-stock' ? 'active' : '' %>" href="/dashboard/low-stock">
             <i class='bx bx-line-chart-down'></i>
             <span class="link-text">Low Stock</span>
         </a>
     </li>
     <li class="nav-item">
-        <a href="/dashboard/users" class="nav-link">
+        <a class="nav-link <%= path === '/dashboard/users' ? 'active' : '' %>" href="/dashboard/users">
             <i class='bx bx-user'></i>
             <span class="link-text">Users</span>
+        </a>
+    </li>
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Reports</span>
+    </h6>
+    <li class="nav-item">
+        <a class="nav-link <%= path === '/dashboard/sales' ? 'active' : '' %>" href="/dashboard/sales">
+            <i class='bx bx-cart'></i>
+            <span class="link-text">Sales</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link <%= path === '/dashboard/finance' ? 'active' : '' %>" href="/dashboard/finance">
+            <i class='bx bx-wallet' ></i>
+            <span class="link-text">Finances</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link disabled <%= path === '/dashboard/payments' ? 'active' : '' %>" href="/dashboard/payments" >
+            <i class='bx bx-money' ></i>
+            <span class="link-text">Payments</span>
         </a>
     </li>
       <!-- Add more nav items as needed -->

@@ -44,6 +44,7 @@
                                                     <th>Weight</th>
                                                     <th>Stock</th>
                                                     <th>Unit Price</th>
+                                                    <th>Selling Price</th>
                                                     <th>Description</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -67,6 +68,9 @@
                                                             </td>
                                                             <td data-label="Unit Price">
                                                                 ₵<%= material.unitPrice.toFixed(2) %>
+                                                            </td>
+                                                            <td data-label="Selling Price">
+                                                                ₵<%= material.sellingPrice ? material.sellingPrice.toFixed(2) : 0 %>
                                                             </td>
                                                             <td data-label="Description">
                                                                 <%= material.description %>

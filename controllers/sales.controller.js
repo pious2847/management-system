@@ -56,7 +56,7 @@ exports.createSale = async (req, res) => {
         }
 
         // Calculate total price
-        const totalAmount = product.unitPrice * quantitySold;
+        const totalAmount = product.sellingPrice * quantitySold;
         const paidAmounts = paidAmount ? parseInt(paidAmount, 10) : 0;
         const balanceAmount = totalAmount - paidAmounts;
 
@@ -263,7 +263,7 @@ exports.updateSale = async (req, res) => {
         }
 
         // Calculate new total price
-        const totalPrice = product.unitPrice * quantitySold;
+        const totalPrice = product.sellingPrice * quantitySold;
 
         // Update sale
         const sale = await Sales.findByIdAndUpdate(id, {

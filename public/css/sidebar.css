@@ -114,6 +114,10 @@
 .nav-link:hover {
     background: var(--primary-color-light);
 }
+.active{
+  background: var(--primary-color-light);
+
+}
 
 .nav-link i {
     min-width: 40px;
@@ -445,5 +449,8 @@
           display: flex;
           gap: 0.5rem;
           justify-content: flex-end;
+      }
+      .summaryCardsContainer{
+        gap: 1rem;
       }
   }

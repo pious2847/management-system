@@ -14,40 +14,15 @@
                             <%- include('./layouts/topnav') %>
 
                                 <div class="content-wrapper my-5">
-                                    <div
-                                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                                        <h1 class="h2">Finance Management</h1>
-                                        <div class="btn-toolbar mb-2 mb-md-0 ">
-                                            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
-                                                data-bs-target="#addTransactionModal">
-                                                Add Transaction
-                                            </button>
-                                            <p class="mb-0 text-muted "></p>
-                                            <div class="btn-group me-2 ">
-                                                <button type="button" id="exportButton"
-                                                    class="btn btn-outline-secondary">Export CSV</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Finance Chart -->
-                                    <div class="row mb-4">
-                                        <div class="col-12">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <canvas id="financeChart"></canvas>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <!-- Finance Summary -->
-                                    <div class="row mb-4">
+                                    <div class="row mb-4 summaryCardsContainer" >
                                         <div class="col-md-4">
                                             <div class="card text-white bg-success">
                                                 <div class="card-body">
                                                     <h5 class="card-title">Total Income</h5>
-                                                    <h3 class="card-text">₵<span id="totalIncome">0</span></h3>
+                                                    <h3 class="card-text">₵ <span id="totalIncome">
+                                                            <%= totalIncome.toFixed(2) %>
+                                                        </span></h3>
                                                 </div>
                                             </div>
                                         </div>
@@ -55,7 +30,9 @@
                                             <div class="card text-white bg-danger">
                                                 <div class="card-body">
                                                     <h5 class="card-title">Total Expenses</h5>
-                                                    <h3 class="card-text">₵<span id="totalExpenses">0</span></h3>
+                                                    <h3 class="card-text">₵ <span id="totalExpenses">
+                                                            <%= totalExpenses.toFixed(2) %>
+                                                        </span></h3>
                                                 </div>
                                             </div>
                                         </div>
@@ -63,12 +40,47 @@
                                             <div class="card text-white bg-primary">
                                                 <div class="card-body">
                                                     <h5 class="card-title">Net Balance</h5>
-                                                    <h3 class="card-text">₵<span id="netBalance">0</span></h3>
+                                                    <h3 class="card-text">₵<span id="netBalance">
+                                                            <%= (totalIncome - totalExpenses).toFixed(2) %>
+                                                        </span></h3>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- Finance Chart -->
+                                    <div class="row mb-4">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div
+                                                        class="pt-0 d-flex flex-wrap justify-content-between align-items-center mb-3">
+                                                        <h5 class="card-title mb-0">Financial Trend</h5>
+                                                    </div>
+                                                    <canvas id="financeChart"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
 
+
+                                    </div>
+                                    <div
+                                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                                        <h5 class="card-title mb-0">Financial Records</h5>
+                                        <div class="d-flex gap-2 align-items-center  flex-wrap flex-md-nowrap "
+                                            style="gap: 1rem;">
+                                            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
+                                                data-bs-target="#addTransactionModal">
+                                                Add Transaction
+                                            </button>
+                                            <div >
+                                                <button type="button" id="exportButton"
+                                                    class="btn btn-outline-primary me-2">Export CSV</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <%- include('./forms/filtterfinancerecords') %>
                                     <!-- Transactions Table -->
                                     <div class="table-responsive">
                                         <table class="table table-striped table-hover">
@@ -85,21 +97,21 @@
                                                 <% transactions.forEach(transaction=> { %>
                                                     <tr
                                                         class="<%= transaction.transactionType === 'income' ? 'table-success' : 'table-danger' %>">
-                                                        <td>
+                                                        <td data-label="Transaction Type">
                                                             <%= transaction.transactionType.charAt(0).toUpperCase() +
                                                                 transaction.transactionType.slice(1) %>
                                                         </td>
-                                                        <td>₵<%= transaction.amount %>
+                                                        <td data-label="Amount">₵<%= transaction.amount %>
                                                         </td>
-                                                        <td>
+                                                        <td data-label="Description">
                                                             <%= transaction.description %>
                                                         </td>
-                                                        <td>
+                                                        <td data-label="Date">
                                                             <%= new
                                                                 Date(transaction.transactionDate).toLocaleDateString()
                                                                 %>
                                                         </td>
-                                                        <td>
+                                                        <td data-label="Actions">
                                                             <div class="d-flex gap-2">
                                                                 <button class="btn btn-sm btn-info edit-transaction"
                                                                     data-transaction-id="<%= transaction._id %>"
@@ -124,6 +136,41 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <!-- Pagination -->
+                                    <nav aria-label="Sales navigation"
+                                        class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="text-muted">
+                                            Showing
+                                            <%= (page - 1) * limit + 1 %>-
+                                                <%= Math.min(page * limit, total) %>
+                                                    of
+                                                    <%= total %> entries
+                                        </div>
+                                        <ul class="pagination mb-0">
+                                            <!-- Previous Button -->
+                                            <li class="page-item <%= page <= 1 ? 'disabled' : '' %>">
+                                                <a class="page-link"
+                                                    href="?page=<%= page - 1 %>&limit=<%= limit %>&startDate=<%= startDate || '' %>&endDate=<%= endDate || '' %>">Previous</a>
+                                            </li>
+
+                                            <!-- Page Numbers -->
+                                            <% for (let i=1; i <=Math.ceil(total / limit); i++) { %>
+                                                <li class="page-item <%= i === page ? 'active' : '' %>">
+                                                    <a class="page-link"
+                                                        href="?page=<%= i %>&limit=<%= limit %>&startDate=<%= startDate || '' %>&endDate=<%= endDate || '' %>">
+                                                        <%= i %>
+                                                    </a>
+                                                </li>
+                                                <% } %>
+
+                                                    <!-- Next Button -->
+                                                    <li
+                                                        class="page-item <%= page >= Math.ceil(total / limit) ? 'disabled' : '' %>">
+                                                        <a class="page-link"
+                                                            href="?page=<%= page + 1 %>&limit=<%= limit %>&startDate=<%= startDate || '' %>&endDate=<%= endDate || '' %>">Next</a>
+                                                    </li>
+                                        </ul>
+                                    </nav>
 
                                 </div>
                         </div>
@@ -324,30 +371,12 @@
                                 y: {
                                     beginAtZero: true
                                 },
-                                
+
 
                             }
                         }
                     });
 
-                    // Update Finance Summary
-                    function updateFinanceSummary() {
-                        let totalIncome = 0;
-                        let totalExpenses = 0;
-
-                        document.querySelectorAll('#transactionsTableBody tr').forEach(row => {
-                            const amount = parseFloat(row.cells[1].textContent.replace('₵', ''));
-                            if (row.cells[0].textContent.trim() === 'Income') {
-                                totalIncome += amount;
-                            } else {
-                                totalExpenses += amount;
-                            }
-                        });
-
-                        document.getElementById('totalIncome').textContent = totalIncome.toFixed(2);
-                        document.getElementById('totalExpenses').textContent = totalExpenses.toFixed(2);
-                        document.getElementById('netBalance').textContent = (totalIncome - totalExpenses).toFixed(2);
-                    }
 
                     // Update Chart Data
                     function updateChartData() {
@@ -375,7 +404,6 @@
                     }
 
                     // Initialize summary and chart
-                    updateFinanceSummary();
                     updateChartData();
                     const exportButton = document.getElementById('exportButton');
                     if (exportButton) {
@@ -477,29 +505,8 @@
                         }
                     });
 
-                    // document.getElementById('exportButton').addEventListener('click', async function () {
-                    //     console.log('Exporting data...');
-                    //     try {
-                    //         const response = await fetch('/api/finance/export');
-                    //         const blob = await response.blob();
-                    //         const url = window.URL.createObjectURL(blob);
-                    //         const a = document.createElement('a');
-                    //         a.href = url;
-                    //         a.download = 'finance_report.csv';
-                    //         document.body.appendChild(a);
-                    //         a.click();
-                    //         window.URL.revokeObjectURL(url);
-                    //     } catch (error) {
-                    //         console.error('Error:', error);
-                    //         alert('Error exporting data');
-                    //     }
-                    // });
-                    // // // Export to CSV
-                    // // window.exportToCSV = 
 
-                    // Handle edit transaction
-                    
-                    
+
                     const editButtons = document.querySelectorAll('.edit-transaction');
                     editButtons.forEach(button => {
                         button.addEventListener('click', () => {

@@ -84,7 +84,8 @@ class ReportGenerator {
 
         // Set column widths and properties
         worksheet.columns = [
-            { header: 'Customer', key: 'customer', width: 30 },
+            
+            { header: "Customer", key: 'customer', width: 30 ,},
             { header: 'Product', key: 'product', width: 20 },
             { header: 'Quantity Sold', key: 'quantitySold', width: 15 },
             { header: 'Total Price (₵)', key: 'totalPrice', width: 15 },
@@ -105,12 +106,20 @@ class ReportGenerator {
 
         // Style header row
         const headerRow = worksheet.getRow(2);
+
         headerRow.font = { bold: true };
         headerRow.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: 'FFE0E0E0' }
         };
+        worksheet.getCell(`A2`).value = 'Customer'
+        worksheet.getCell(`B2`).value = 'Product'
+        worksheet.getCell(`C2`).value = 'Quantity Sold'
+        worksheet.getCell(`D2`).value = 'Total Price (₵)'
+        worksheet.getCell(`E2`).value = 'Sale Date'
+        worksheet.getCell(`F2`).value = 'Payment Status'
+        worksheet.getCell(`G2`).value = 'Amount Paid (₵)'
 
         // Add data and apply formatting
         salesData.forEach(data => {
@@ -136,6 +145,18 @@ class ReportGenerator {
         worksheet.getCell(`D${lastRow}`).value = { formula: `SUM(D3:D${lastRow-1})` };
         worksheet.getCell(`G${lastRow}`).value = { formula: `SUM(G3:G${lastRow-1})` };
 
+        // add differences between total price abd amount paid
+        worksheet.mergeCells(`A${lastRow+1}:F${lastRow+1}`)
+        worksheet.getCell(`A${lastRow+1}`).value = 'Differences Amount Between Total Price and Paid Amount'
+        worksheet.getCell(`G${lastRow+1}`).value = {formula: `=SUM(D${lastRow}-G${lastRow})`};
+       
+       const Income_Differences = worksheet.getRow(lastRow+1)
+       Income_Differences.font = {bold: true}
+       Income_Differences.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFF0F0F0' }
+    };
         // Style totals row
         const totalsRow = worksheet.getRow(lastRow);
         totalsRow.font = { bold: true };

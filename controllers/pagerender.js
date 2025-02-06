@@ -5,6 +5,7 @@ const Sales = require('../models/sales');
 const Finance = require('../models/finance');
 const aggregateDataIntoMonths = require("../utils/aggregate");
 const Customer = require("../models/customer");
+const transaction = require("paystack-api/resources/transaction");
 
 const pageRender = {
 
@@ -43,7 +44,8 @@ const pageRender = {
                 totalLowMaterials,
                 months: JSON.stringify(months),
                 materialData: materialRecords,
-                supplyData: supplyRecords
+                supplyData: supplyRecords,
+                path: '/dashboard'
             });
         } catch (error) {
             console.error(error);
@@ -62,7 +64,9 @@ const pageRender = {
                 totalSupplies: 80,
                 totalUsers: 50,
                 materials,
-                alert
+                alert,
+                path: '/dashboard/materials'
+
             })
 
         } catch (error) {
@@ -81,7 +85,9 @@ const pageRender = {
         res.render('supplies', {
             materials,
             supplies,
-            alert
+            alert,
+            path: '/dashboard/supplies'
+
         })
     },
     async getLowStockMaterials(req, res) {
@@ -99,7 +105,8 @@ const pageRender = {
                 totalSupplies: 80,
                 totalUsers: 50,
                 materials,
-                alert
+                alert,
+                path: '/dashboard/low-stock'
             })
 
         } catch (error) {
@@ -115,9 +122,13 @@ const pageRender = {
 
             const users = await User.find()
 
-            res.render('users', { alert, users })
+                
+            res.render('users', { alert, users, path: '/dashboard/users'})
         } catch (error) {
-
+            console.error('Error loading user page:', error);
+            req.flash('message', 'Error loading user page');
+            req.flash('status', 'danger');
+            res.redirect('/dashboard');
         }
     },
     async getSales(req, res) {
@@ -126,7 +137,10 @@ const pageRender = {
             const alertStatus = req.flash('status');
             const alert = { message: alertMessage, status: alertStatus };
 
-            let { page = 1, limit = 10, startDate, endDate } = req.query;
+            let { page = 1, limit = 10, } = req.query;
+
+            const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+            const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
 
             page = parseInt(page);
             limit = parseInt(limit);
@@ -151,6 +165,49 @@ const pageRender = {
             // Count total sales
             const total = await Sales.countDocuments(filter);
 
+            const stats = await Sales.aggregate([
+                {
+                    $match: {
+                        ...(startDate || endDate ? {
+                            saleDate: {
+                                ...(startDate && { $gte: startDate }),
+                                ...(endDate && { $lte: endDate })
+                            }
+                        } : {})
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: '$saleDate' },
+                            month: { $month: '$saleDate' }
+                        },
+                        totalSales: { $sum: '$totalPrice' },
+                        totalItems: { $sum: '$quantitySold' },
+                        count: { $sum: 1 }
+                    }
+                },
+                { $sort: { '_id.year': 1, '_id.month': 1 } }
+            ]);
+
+            let totalCostPrice = 0;
+            let totalSellingPrice = 0;
+            let TotalCurrentAmount = 0;
+            let Profit = 0;
+
+
+            sales.forEach(sale=>{
+                TotalCurrentAmount += (sale.payment.paidAmount != 0 ? sale.payment.balanceAmount:sale.payment.totalAmount);
+                totalCostPrice += ((sale.productId.unitPrice)*(sale.quantitySold));
+                totalSellingPrice += ((sale.productId.sellingPrice)*(sale.quantitySold));
+
+            });
+
+            Profit = totalSellingPrice - totalCostPrice;
+
+            const totalSales = stats.reduce((sum, item) => sum + item.totalSales, 0);
+            const totalItems = stats.reduce((sum, item) => sum + item.totalItems, 0);
+            const avgSale = (totalSales / stats.reduce((sum, item) => sum + item.count, 0)) || 0;
             
             const materials = await Materials.find();
             const customers = await Customer.find();
@@ -166,7 +223,13 @@ const pageRender = {
                 startDate,
                 endDate,
                 title: 'Sales Management',
-                isEdit: false
+                isEdit: false,
+                totalSales,
+                totalItems,
+                avgSale,
+                stats,
+                Profit,
+                path: '/dashboard/sales'
             });
         } catch (error) {
             console.error('Error loading sales page:', error);
@@ -180,22 +243,61 @@ const pageRender = {
             const alertMessage = req.flash('message');
             const alertStatus = req.flash('status');
             const alert = { message: alertMessage, status: alertStatus };
+            const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+            const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
 
-            const endDate = new Date();
-            const startDate = new Date(endDate);
-            startDate.setDate(startDate.getDate() - 30);
+            let { page = 1, limit = 10,transactionType='' } = req.query;
 
-            const transactions = await Finance.find()
+            const filter = {};
+            if (startDate && endDate) {
+                filter.transactionDate = {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate)
+                };
+            }
+            if(transactionType){
+                filter.transactionType = transactionType;
+            }
+
+            const transactions = await Finance.find(filter)
                 .sort({ transactionDate: -1 })
-                .limit(10);
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            const total = await Finance.countDocuments(filter);
 
             const totals = await Finance.calculateTotals(startDate, endDate);
+            let totalIncome = 0;
+            let totalExpenses = 0;
+
+            const incomes = transactions.filter(transaction=>
+                transaction.transactionType === 'income'
+            )
+            const expenses = transactions.filter(transaction=>
+                transaction.transactionType === 'expense'
+            )
+              
+            incomes.forEach(income => {
+                totalIncome += income.amount;
+            });
+            expenses.forEach(expense => {
+                totalExpenses += expense.amount;
+            });
 
             res.render('finance', {
                 transactions,
                 totals,
                 alert,
-                title: 'Finance Management'
+                title: 'Finance Management',
+                totalIncome,
+                totalExpenses,
+                total,
+                page,
+                limit, 
+                startDate,
+                endDate,
+                path: '/dashboard/finance',
+                transactionType
             });
         } catch (error) {
             console.error('Error loading finance page:', error);
