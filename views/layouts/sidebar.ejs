@@ -8,7 +8,11 @@
       
       <span class="logo-text"><span class="text-primary">Stoc</span>kify</span>
   </div>
+
   <ul class="nav-links">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span style="font-size: 10px;">Overview</span>
+    </h6>
     <li class="nav-item">
         <a class="nav-link  <%= path === '/dashboard' ? 'active' : '' %>" href="/dashboard">
             <i class='bx bx-grid-alt'></i>
@@ -27,7 +31,6 @@
             <span class="link-text">Supplies</span>
         </a>
     </li>
-
     <li class="nav-item">
         <a class="nav-link <%= path === '/dashboard/low-stock' ? 'active' : '' %>" href="/dashboard/low-stock">
             <i class='bx bx-line-chart-down'></i>
@@ -41,7 +44,7 @@
         </a>
     </li>
     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-        <span>Reports</span>
+        <span style="font-size: 10px;">Reports</span>
     </h6>
     <li class="nav-item">
         <a class="nav-link <%= path === '/dashboard/sales' ? 'active' : '' %>" href="/dashboard/sales">
@@ -56,9 +59,18 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link disabled <%= path === '/dashboard/payments' ? 'active' : '' %>" href="/dashboard/payments" >
+        <a class="nav-link  <%= path === '/dashboard/payments' ? 'active' : '' %>" href="/dashboard/payments" >
             <i class='bx bx-money' ></i>
             <span class="link-text">Payments</span>
+        </a>
+    </li>
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span style="font-size: 10px;">Emails</span>
+    </h6>
+    <li class="nav-item">
+        <a class="nav-link  <%= path === '/dashboard/messaging' ? 'active' : '' %>" href="/dashboard/messaging" >
+            <i class='bx bx-notification' ></i>
+            <span class="link-text">Messaging</span>
         </a>
     </li>
       <!-- Add more nav items as needed -->

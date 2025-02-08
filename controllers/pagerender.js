@@ -6,6 +6,7 @@ const Finance = require('../models/finance');
 const aggregateDataIntoMonths = require("../utils/aggregate");
 const Customer = require("../models/customer");
 const transaction = require("paystack-api/resources/transaction");
+const Payment = require("../models/payments");
 
 const pageRender = {
 
@@ -122,8 +123,8 @@ const pageRender = {
 
             const users = await User.find()
 
-                
-            res.render('users', { alert, users, path: '/dashboard/users'})
+
+            res.render('users', { alert, users, path: '/dashboard/users' })
         } catch (error) {
             console.error('Error loading user page:', error);
             req.flash('message', 'Error loading user page');
@@ -196,10 +197,10 @@ const pageRender = {
             let Profit = 0;
 
 
-            sales.forEach(sale=>{
-                TotalCurrentAmount += (sale.payment.paidAmount != 0 ? sale.payment.balanceAmount:sale.payment.totalAmount);
-                totalCostPrice += ((sale.productId.unitPrice)*(sale.quantitySold));
-                totalSellingPrice += ((sale.productId.sellingPrice)*(sale.quantitySold));
+            sales.forEach(sale => {
+                TotalCurrentAmount += (sale.payment.paidAmount != 0 ? sale.payment.balanceAmount : sale.payment.totalAmount);
+                totalCostPrice += ((sale.productId.unitPrice) * (sale.quantitySold));
+                totalSellingPrice += ((sale.productId.sellingPrice) * (sale.quantitySold));
 
             });
 
@@ -208,7 +209,7 @@ const pageRender = {
             const totalSales = stats.reduce((sum, item) => sum + item.totalSales, 0);
             const totalItems = stats.reduce((sum, item) => sum + item.totalItems, 0);
             const avgSale = (totalSales / stats.reduce((sum, item) => sum + item.count, 0)) || 0;
-            
+
             const materials = await Materials.find();
             const customers = await Customer.find();
 
@@ -246,7 +247,7 @@ const pageRender = {
             const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
             const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
 
-            let { page = 1, limit = 10,transactionType='' } = req.query;
+            let { page = 1, limit = 10, transactionType = '' } = req.query;
 
             const filter = {};
             if (startDate && endDate) {
@@ -255,7 +256,7 @@ const pageRender = {
                     $lte: new Date(endDate)
                 };
             }
-            if(transactionType){
+            if (transactionType) {
                 filter.transactionType = transactionType;
             }
 
@@ -270,13 +271,13 @@ const pageRender = {
             let totalIncome = 0;
             let totalExpenses = 0;
 
-            const incomes = transactions.filter(transaction=>
+            const incomes = transactions.filter(transaction =>
                 transaction.transactionType === 'income'
             )
-            const expenses = transactions.filter(transaction=>
+            const expenses = transactions.filter(transaction =>
                 transaction.transactionType === 'expense'
             )
-              
+
             incomes.forEach(income => {
                 totalIncome += income.amount;
             });
@@ -293,7 +294,7 @@ const pageRender = {
                 totalExpenses,
                 total,
                 page,
-                limit, 
+                limit,
                 startDate,
                 endDate,
                 path: '/dashboard/finance',
@@ -304,6 +305,69 @@ const pageRender = {
             req.flash('message', 'Error loading finance page');
             req.flash('status', 'danger');
             res.redirect('/dashboard');
+        }
+    },
+    async getPayments(req, res) {
+        try {
+            const alertMessage = req.flash('message');
+            const alertStatus = req.flash('status');
+            const alert = { message: alertMessage, status: alertStatus };
+            const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+            const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+
+            let { page = 1, limit = 10, transactionType = '' } = req.query;
+
+            const filter = {};
+            if (startDate && endDate) {
+                filter.paymentHistory.paymentDate = {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate)
+                };
+            }
+            // Get all completed payments in date range
+            const payments = await Payment.find(filter)
+                .populate({
+                    path: 'sale',
+                })
+                .populate('customer')
+                .populate('product')
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            const total = await Payment.countDocuments(filter);
+
+            res.render('payments', {
+                payments: payments,
+                startDate,
+                endDate,
+                page,
+                total,
+                limit,
+                alert,
+                path: '/dashboard/payments',
+            })
+        } catch (error) {
+            console.error('Error loading payments page:', error);
+            req.flash('message', 'Error loading payments page');
+            req.flash('status', 'danger');
+            res.redirect('/dashboard');
+        }
+    },
+
+    async getMessaging(req, res){
+        try{
+            const alertMessage = req.flash('message');
+            const alertStatus = req.flash('status');
+            const alert = { message: alertMessage, status: alertStatus };
+
+            const customers = await  Customer.find();
+
+
+            res.render('message', {alert, path:'/dashboard/messaging',customers})
+
+        }catch(error){
+
         }
     }
 }

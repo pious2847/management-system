@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./layouts/header') %>
+
+    <body>
+        <%- include('./popups/alert') %>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <%- include('./layouts/sidebar') %>
+                        <!-- Mobile Overlay -->
+                        <div class="mobile-overlay"></div>
+                        <div class="main-content p-3">
+                            <%- include('./layouts/topnav') %>
+
+                                <div class="content-wrapper my-5">
+
+                                    <!-- Title with icon -->
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <h5 class="card-title mb-1 fw-bold text-primary">Email Messaging
+                                            </h5>
+                                            <p class="text-muted small mb-0">Send Email to customers or send
+                                                custom emails</p>
+                                        </div>
+                                    </div>
+                                  
+                                            <div
+                                                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-5 pb-2 mb-3 border-bottom">
+                                                <form action="">
+                                                    <div class="row gap-3">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label for="email" class="form-label">Email</label>
+                                                                <input type="email" class="form-control" name="email" id="email"
+                                                                    aria-describedby="emailHelpId"
+                                                                    placeholder="abc@mail.com" />
+                                                                <small id="emailHelpId" class="form-text text-muted">Help
+                                                                    text</small>
+                                                            </div>
+                                                        </div>
+                                                      
+                                                        <!-- Customer Selection -->
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label for="customerId"
+                                                                    class="form-label fw-semibold">Customer</label>
+                                                                <select class="form-control" id="customerId"
+                                                                    name="customerId">
+                                                                    <option value="">Select Customer</option>
+                                                                    <% customers.forEach(function(customer) { %>
+                                                                        <option value="<%= customer._id %>">
+                                                                            <%= customer.name %> (Phone: <%=
+                                                                                    customer.phone %>)
+                                                                        </option>
+                                                                        <% }); %>
+                                                                </select>
+                                                                <p class="form-text text-danger display-6"
+                                                                    style="font-size: 10px;">
+                                                                    Select a customer if they are an existing
+                                                                    customer; otherwise, provide
+                                                                    customer details
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="form-label fw-semibold">Email Template</label>
+                                                                <select class="form-control" name="template" id="template" required>
+                                                                    <option value="" disabled>Select Template</option>
+                                                                    <option value="custom">Custom</option>
+                                                                    <option value="paid">Paid Customers</option>
+                                                                    <option value="pending">Pending Payments</option>
+                                                                    <option value="partially_paid">Partially Paid</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label for="message" class="form-label">Message</label>
+                                                            <textarea class="form-control" name="message" id="message"
+                                                                rows="3"></textarea>
+                                                            </div>
+                                                        </div>
+                                                      
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Reset</button>
+                                                        <button type="submit" class="btn btn-primary">Send Mails</button>
+                                                    </div>
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                </div>
+            </div>
+            </div>
+
+
+
+
+
+
+            <%- include('layouts/footer') %>
+
+    </body>
+
+</html>

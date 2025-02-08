@@ -65,6 +65,7 @@ exports.createSale = async (req, res) => {
             totalAmount,
             balanceAmount,
             paidAmount: paidAmounts,
+            product: productId,
             paymentHistory: [
                 {
                     amount: paidAmounts,

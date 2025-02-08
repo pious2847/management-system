@@ -120,7 +120,7 @@
                                                     </thead>
                                                     <tbody id="salesTableBody">
                                                         <% sales.forEach(sale=> { %>
-                                                            <tr>
+                                                            <tr class="<%= sale.payment.paymentStatus  === 'paid' ? 'table-success' : 'table-danger' %>">
                                                                 <td data-label="Product">
                                                                     <%= sale.productId.name %>
                                                                 </td>
@@ -150,7 +150,7 @@
                                                                 </td>
                                                                 <td data-label="Status">
                                                                     <span
-                                                                        class="badge p-2 bg-<%= sale.payment.paymentStatus === 'completed' ? 'success' : (sale.payment.paymentStatus === 'pending' ? 'warning' : 'danger') %>">
+                                                                        class="badge p-2 bg-<%= sale.payment.paymentStatus === 'paid' ? 'success' : (sale.payment.paymentStatus === 'pending' ? 'warning' : 'danger') %>">
                                                                         <%= sale.payment.paymentStatus.replace('_', ' ') %>
                                                                     </span>
                                                                 </td>
@@ -344,7 +344,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="paidAmount" class="form-label fw-semibold">Amount Paid</label>
-                                        <input type="number" class="form-control" id="paidAmount" name="paidAmount">
+                                        <input type="number" class="form-control" id="paidAmount" name="paidAmount" min="1">
                                         <p class="form-text text-danger display-6" style="font-size: 10px;">
 
                                             Enter the amount paid only if the user makes a partial payment or purchases

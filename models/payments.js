@@ -10,6 +10,10 @@ const paymentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Sales',
     },
+    product:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Materials'
+    },
     totalAmount: {
         type: Number,
         required: true,

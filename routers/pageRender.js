@@ -12,5 +12,7 @@ router.get('/dashboard/low-stock', isLoggedIn,pageRender.getLowStockMaterials)
 router.get('/dashboard/users', isLoggedIn,pageRender.getUsers)
 router.get('/dashboard/sales', isLoggedIn, pageRender.getSales);
 router.get('/dashboard/finance', isLoggedIn, pageRender.getFinance);
+router.get('/dashboard/payments', isLoggedIn, pageRender.getPayments);
+router.get('/dashboard/messaging', isLoggedIn, pageRender.getMessaging);
 
 module.exports = router
